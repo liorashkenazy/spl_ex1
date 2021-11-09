@@ -8,6 +8,7 @@
 #include "Action.h"
 
 
+
 class Studio{		
 public:
 	Studio();
@@ -23,6 +24,8 @@ private:
     std::vector<Trainer*> trainers;
     std::vector<Workout> workout_options;
     std::vector<BaseAction*> actionsLog;
+
+    void addWorkoutFromConfig(const std::string &workout_info, int workout_id);
 };
 
 #endif
