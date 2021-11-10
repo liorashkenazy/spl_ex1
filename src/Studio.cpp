@@ -13,7 +13,7 @@
 void Studio::addWorkoutFromConfig(const std::string &workout_info, int workout_id)
 {
     int first_delim_pos(workout_info.find(","));
-    int second_delim_pos(workout_info.find(",", first_delim_pos));
+    int second_delim_pos(workout_info.find(",", first_delim_pos+1));
     std::string workout_name(workout_info.substr(0, first_delim_pos));
     std::string workout_type(first_delim_pos + 2, second_delim_pos);
     WorkoutType w_type;
@@ -37,11 +37,15 @@ Studio::Studio(const std::string &configFilePath): open(false)
     bool capacities_read(false);
     int num_trainers(0);
     int current_delim_pos(0);
-    std::fstream config_file;
+    std::ifstream config_file;
     std::string cur_line;
     int workout_id(0);
     config_file.open(configFilePath);
 
+    if(config_file.is_open())
+        std::cout << "open" << std::endl;
+    else
+        std::cout <<"not open" << std::endl;
     while (std::getline(config_file, cur_line)) {
         if (cur_line.length() == 0 || cur_line.at(0) == '#') {
             continue;
@@ -65,3 +69,13 @@ Studio::Studio(const std::string &configFilePath): open(false)
         }
     }
 }
+//void Studio::getAll()
+//{
+//    int numOfTrainers(5);
+//    numOfTrainers = trainers.size();
+//    std::cout <<numOfTrainers<< std::endl;
+//    std::cout <<(trainers.at(0)->getCapacity())<< std::endl;
+//    std::cout <<"id: " << workout_options.at(0).getId()<< " name: "<<workout_options.at(0).getName()
+//    << " price: "<<workout_options.at(0).getPrice() << " type: " << workout_options.at(0).getType()<< std::endl;
+//
+//}

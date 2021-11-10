@@ -18,7 +18,8 @@ public:
     Trainer* getTrainer(int tid);
 	const std::vector<BaseAction*>& getActionsLog() const; // Return a reference to the history of actions
     std::vector<Workout>& getWorkoutOptions();
-
+    // internal checking
+    void getAll();
 private:
     bool open;
     std::vector<Trainer*> trainers;
@@ -26,6 +27,7 @@ private:
     std::vector<BaseAction*> actionsLog;
 
     void addWorkoutFromConfig(const std::string &workout_info, int workout_id);
+
 };
 
 #endif
