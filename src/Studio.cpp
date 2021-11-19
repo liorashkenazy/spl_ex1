@@ -10,9 +10,6 @@
 #include "Workout.h"
 #include "Trainer.h"
 
-#define ANEROBIC_TYPE_STR "Anaerobic"
-#define MIXED_TYPE_STR "Mixed"
-
 void Studio::addWorkoutFromConfig(const std::string &workout_info, int workout_id)
 {
     int first_delim_pos(workout_info.find(","));
@@ -69,13 +66,25 @@ Studio::Studio(const std::string &configFilePath): open(false)
         }
     }
 }
-//void Studio::getAll()
-//{
-//    int numOfTrainers(5);
-//    numOfTrainers = trainers.size();
-//    std::cout <<numOfTrainers<< std::endl;
-//    std::cout <<(trainers.at(0)->getCapacity())<< std::endl;
-//    std::cout <<"id: " << workout_options.at(0).getId()<< " name: "<<workout_options.at(0).getName()
-//    << " price: "<<workout_options.at(0).getPrice() << " type: " << workout_options.at(0).getType()<< std::endl;
-//
-//}
+void Studio::getAll()
+{
+    std::cout << "Number of trainers: " << trainers.size() << std::endl;
+    for (size_t i = 0; i < trainers.size(); i++) {
+        std::cout << "Trainer[" << i << "], capacity: " << trainers.at(i)->getCapacity() << std::endl;
+    }
+    for (size_t i = 0; i < workout_options.size(); i++) {
+        Workout w = workout_options.at(i);
+        switch (w.getType()) {
+            case ANAEROBIC:
+                std::cout << "Workout name: " << w.getName() << ", " << ANEROBIC_TYPE_STR <<", price: " << w.getPrice();
+                break;
+            case MIXED:
+                std::cout << "Workout name: " << w.getName() << ", " << MIXED_TYPE_STR <<", price: " << w.getPrice();
+                break;
+            case CARDIO:
+                std::cout << "Workout name: " << w.getName() << ", " << CARDIO_TYPE_STR <<", price: " << w.getPrice();
+                break;
+        }
+        std::cout << std::endl;
+    }
+}

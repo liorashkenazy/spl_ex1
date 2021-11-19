@@ -13,7 +13,7 @@ int main(int argc, char** argv){
     }
     string configurationFile = argv[1];
     Studio studio("config.txt");
-//    studio.getAll();
+    studio.getAll();
 //    studio.start();
 //    if(backup!=nullptr){
 //    	delete backup;
