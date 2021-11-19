@@ -39,16 +39,11 @@ Studio::Studio(const std::string &configFilePath): open(false)
     bool num_trainers_read(false);
     bool capacities_read(false);
     int num_trainers(0);
-    int current_delim_pos(0);
     std::ifstream config_file;
     std::string cur_line;
     int workout_id(0);
     config_file.open(configFilePath);
 
-    if(config_file.is_open())
-        std::cout << "open" << std::endl;
-    else
-        std::cout <<"not open" << std::endl;
     while (std::getline(config_file, cur_line)) {
         if (cur_line.length() == 0 || cur_line.at(0) == '#') {
             continue;
@@ -58,12 +53,14 @@ Studio::Studio(const std::string &configFilePath): open(false)
             num_trainers_read = true;
         }
         else if (!capacities_read) {
-            while (cur_line.find(",", current_delim_pos) != std::string::npos) {
-                trainers.push_back(new Trainer(std::stoi(cur_line.substr(current_delim_pos,
-                                                                            cur_line.find(",", current_delim_pos)))));
-                current_delim_pos = cur_line.find(",", current_delim_pos) + 1;
+            size_t next_pos(0);
+            size_t current_pos(0);
+            for (int i = 0; i < num_trainers; i++) {
+                // Read the current capacity, and extract the position of the next capacity
+                trainers.push_back(new Trainer(std::stoi(cur_line.substr(current_pos), &next_pos)));
+                // Skip over the ','
+                current_pos += next_pos + 1;
             }
-            trainers.push_back(new Trainer(std::stoi(cur_line.substr(current_delim_pos))));
             capacities_read = true;
         }
         else {
