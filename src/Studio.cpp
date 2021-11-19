@@ -10,18 +10,21 @@
 #include "Workout.h"
 #include "Trainer.h"
 
+#define ANEROBIC_TYPE_STR "Anaerobic"
+#define MIXED_TYPE_STR "Mixed"
+
 void Studio::addWorkoutFromConfig(const std::string &workout_info, int workout_id)
 {
     int first_delim_pos(workout_info.find(","));
     int second_delim_pos(workout_info.find(",", first_delim_pos+1));
     std::string workout_name(workout_info.substr(0, first_delim_pos));
-    std::string workout_type(first_delim_pos + 2, second_delim_pos);
+    std::string workout_type(workout_info.substr(first_delim_pos + 2, second_delim_pos - (first_delim_pos + 2)));
     WorkoutType w_type;
     int price(0);
 
-    if (workout_type.compare("Anaeorbic") == 0) {
+    if (workout_type.compare(ANEROBIC_TYPE_STR) == 0) {
         w_type = ANAEROBIC;
-    } else if (workout_type.compare("Mixed") == 0) {
+    } else if (workout_type.compare(MIXED_TYPE_STR) == 0) {
         w_type = MIXED;
     } else {
         w_type = CARDIO;
