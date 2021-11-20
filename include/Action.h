@@ -33,6 +33,7 @@ public:
     OpenTrainer(int id, std::vector<Customer *> &customersList);
     void act(Studio &studio);
     std::string toString() const;
+    static OpenTrainer *createOpenTrainerAction(const std::string &data, int next_customer_id);
 private:
 	const int trainerId;
 	std::vector<Customer *> customers;

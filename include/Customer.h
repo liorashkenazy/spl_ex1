@@ -5,6 +5,11 @@
 #include <string>
 #include "Workout.h"
 
+#define CUSTOMER_TYPE_CHEAP_STR "chp"
+#define CUSTOMER_TYPE_SWEATY_STR "swt"
+#define CUSTOMER_TYPE_HEAVY_MUSCLE_STR "mcl"
+#define CUSTOMER_TYPE_FULL_BODY_STR "fbd"
+
 class Customer{
 public:
     Customer(std::string c_name, int c_id);
@@ -52,6 +57,5 @@ public:
     std::string toString() const;
 private:
 };
-
 
 #endif

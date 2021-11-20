@@ -10,7 +10,7 @@ typedef std::pair<int, Workout> OrderPair;
 class Trainer{
 public:
     Trainer(int t_capacity);
-    int getCapacity() const { return capacity; };
+    int getCapacity() const;
     void addCustomer(Customer* customer);
     void removeCustomer(int id);
     Customer* getCustomer(int id);

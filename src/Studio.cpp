@@ -35,7 +35,8 @@ void Studio::addWorkoutFromConfig(const std::string &workout_info, int workout_i
                                          w_type));
 }
 
-Studio::Studio(const std::string &configFilePath): open(false), trainers(), workout_options(), actionsLog()
+Studio::Studio(const std::string &configFilePath):
+        open(false), trainers(), workout_options(), actionsLog(), next_customer_id(0)
 {
     bool num_trainers_read(false);
     bool capacities_read(false);
@@ -79,4 +80,8 @@ void Studio::getAll()
     }
 
     print_action.act(*this);
+}
+
+int Studio::getCurrentCustomerId() const {
+    return next_customer_id;
 }
