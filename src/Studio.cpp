@@ -85,3 +85,11 @@ void Studio::getAll()
 int Studio::getCurrentCustomerId() const {
     return next_customer_id;
 }
+
+int Studio::getNumOfTrainers() const {
+    return trainers.size();
+}
+
+Trainer *Studio::getTrainer(int tid) {
+    return trainers[tid];
+}

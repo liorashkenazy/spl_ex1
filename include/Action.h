@@ -5,6 +5,17 @@
 #include <iostream>
 #include "Customer.h"
 
+#define ACTION_TYPE_OPEN_TRAINER_STR "open"
+#define ACTION_TYPE_ORDER_STR "order"
+#define ACTION_TYPE_MOVE_CUSTOMER_STR "move"
+#define ACTION_TYPE_CLOSE_STR "close"
+#define ACTION_TYPE_CLOSE_ALL_STR "closeall"
+#define ACTION_TYPE_PRINT_OPTIONS_STR "workout_options"
+#define ACTION_TYPE_PRINT_T_STATUS_STR "status"
+#define ACTION_TYPE_PRINT_LOG_STR "log"
+#define ACTION_TYPE_BACKUP_STR "backup"
+#define ACTION_TYPE_RESTORE_STR "restore"
+
 enum ActionStatus{
     COMPLETED, ERROR
 };
@@ -45,6 +56,7 @@ public:
     Order(int id);
     void act(Studio &studio);
     std::string toString() const;
+    static Order *createOrder(const std::string& data);
 private:
     const int trainerId;
 };
@@ -55,6 +67,7 @@ public:
     MoveCustomer(int src, int dst, int customerId);
     void act(Studio &studio);
     std::string toString() const;
+    static MoveCustomer *createMoveCustomer(const std::string &data);
 private:
     const int srcTrainer;
     const int dstTrainer;
