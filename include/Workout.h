@@ -3,7 +3,7 @@
 
 #include <string>
 
-#define ANEROBIC_TYPE_STR "Anaerobic"
+#define ANAEROBIC_TYPE_STR "Anaerobic"
 #define MIXED_TYPE_STR "Mixed"
 #define CARDIO_TYPE_STR "Cardio"
 
@@ -14,10 +14,11 @@ enum WorkoutType{
 class Workout{
 public:
     Workout(int w_id, std::string w_name, int w_price, WorkoutType w_type);
-    int getId() const { return id; };
-    std::string getName() const { return name; };
-    int getPrice() const { return price; };
-    WorkoutType getType() const { return type; };
+    int getId() const;
+    std::string getName() const;
+    int getPrice() const;
+    WorkoutType getType() const;
+    std::string toString() const;
 private:
 	const int id;
     const std::string name;

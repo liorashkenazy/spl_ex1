@@ -9,29 +9,33 @@
 #include "Studio.h"
 #include "Workout.h"
 #include "Trainer.h"
+#include "Action.h"
+
+std::vector<Workout>& Studio::getWorkoutOptions() { return workout_options; }
 
 void Studio::addWorkoutFromConfig(const std::string &workout_info, int workout_id)
 {
-    int first_delim_pos(workout_info.find(","));
-    int second_delim_pos(workout_info.find(",", first_delim_pos+1));
+    size_t first_delim_pos(workout_info.find(','));
+    size_t second_delim_pos(workout_info.find(',', first_delim_pos+1));
     std::string workout_name(workout_info.substr(0, first_delim_pos));
     std::string workout_type(workout_info.substr(first_delim_pos + 2, second_delim_pos - (first_delim_pos + 2)));
     WorkoutType w_type;
-    int price(0);
 
-    if (workout_type.compare(ANEROBIC_TYPE_STR) == 0) {
+    if (workout_type == ANAEROBIC_TYPE_STR) {
         w_type = ANAEROBIC;
-    } else if (workout_type.compare(MIXED_TYPE_STR) == 0) {
+    } else if (workout_type == MIXED_TYPE_STR) {
         w_type = MIXED;
     } else {
         w_type = CARDIO;
     }
 
-    price = std::stoi(workout_info.substr(second_delim_pos + 2));
-    workout_options.push_back(Workout(workout_id, workout_name, price, w_type));
+    workout_options.emplace_back(Workout(workout_id,
+                                         workout_name,
+                                         std::stoi(workout_info.substr(second_delim_pos + 2)),
+                                         w_type));
 }
 
-Studio::Studio(const std::string &configFilePath): open(false)
+Studio::Studio(const std::string &configFilePath): open(false), trainers(), workout_options(), actionsLog()
 {
     bool num_trainers_read(false);
     bool capacities_read(false);
@@ -68,23 +72,11 @@ Studio::Studio(const std::string &configFilePath): open(false)
 }
 void Studio::getAll()
 {
+    PrintWorkoutOptions print_action;
     std::cout << "Number of trainers: " << trainers.size() << std::endl;
     for (size_t i = 0; i < trainers.size(); i++) {
         std::cout << "Trainer[" << i << "], capacity: " << trainers.at(i)->getCapacity() << std::endl;
     }
-    for (size_t i = 0; i < workout_options.size(); i++) {
-        Workout w = workout_options.at(i);
-        switch (w.getType()) {
-            case ANAEROBIC:
-                std::cout << "Workout name: " << w.getName() << ", " << ANEROBIC_TYPE_STR <<", price: " << w.getPrice();
-                break;
-            case MIXED:
-                std::cout << "Workout name: " << w.getName() << ", " << MIXED_TYPE_STR <<", price: " << w.getPrice();
-                break;
-            case CARDIO:
-                std::cout << "Workout name: " << w.getName() << ", " << CARDIO_TYPE_STR <<", price: " << w.getPrice();
-                break;
-        }
-        std::cout << std::endl;
-    }
+
+    print_action.act(*this);
 }
