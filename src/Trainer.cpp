@@ -36,6 +36,12 @@ Customer *Trainer::getCustomer(int id) {
 }
 
 void Trainer::removeCustomer(int id) {
+    // Remove the customer's orders
+    orderList.erase(std::remove_if(orderList.begin(),
+                                   orderList.end(),
+                                   [&id](const OrderPair &cur) { return cur.first == id; }),
+                    orderList.end());
+    // Remove the customer
     customersList.erase(std::remove(customersList.begin(), customersList.end(), getCustomer(id)));
 }
 

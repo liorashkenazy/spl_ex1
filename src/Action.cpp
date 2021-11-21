@@ -93,6 +93,7 @@ void OpenTrainer::act(Studio &studio)
         pTrainer->addCustomer(pCustomer);
     }
     pTrainer->openTrainer();
+    complete();
 }
 
 std::string OpenTrainer::toString() const { return "Heyyy"; }
@@ -120,13 +121,45 @@ void Order::act(Studio &studio) {
             std::cout << customer->getName() << " Is Doing " << workout_options.at(order).getName() << std::endl;
         }
     }
+    complete();
 }
 
 Order::Order(int id) : trainerId(id) {}
 
 MoveCustomer::MoveCustomer(int src, int dst, int customerId) : srcTrainer(src), dstTrainer(dst), id(customerId) {}
 
-void MoveCustomer::act(Studio &studio) {}
+void MoveCustomer::act(Studio &studio)
+{
+    if (studio.getNumOfTrainers() <= srcTrainer || srcTrainer < 0 || !studio.getTrainer(srcTrainer)->isOpen() ||
+        studio.getNumOfTrainers() <= dstTrainer || dstTrainer < 0 || !studio.getTrainer(dstTrainer)->isOpen() ||
+        studio.getTrainer(dstTrainer)->getCapacity() <= studio.getTrainer(dstTrainer)->getCustomers().size() ||
+        studio.getTrainer(srcTrainer)->getCustomer(id) != nullptr) {
+        error("Cannot move customer");
+        return;
+    }
+
+    Trainer *pSrcTrainer = studio.getTrainer(srcTrainer);
+    Trainer *pDstTrainer = studio.getTrainer(dstTrainer);
+    Customer *pCustomer = pSrcTrainer->getCustomer(id);
+    std::vector<int> orders;
+    for (const OrderPair &order : pSrcTrainer->getOrders()) {
+        if (order.first == id) {
+            orders.push_back(order.second.getId());
+        }
+    }
+
+    // Transfer ownership
+    pSrcTrainer->removeCustomer(id);
+    pDstTrainer->addCustomer(pCustomer);
+
+    pDstTrainer->order(id, orders, studio.getWorkoutOptions());
+
+    if (pSrcTrainer->getCustomers().size() == 0) {
+        pSrcTrainer->closeTrainer();
+    }
+
+    complete();
+}
 
 std::string MoveCustomer::toString() const {
     return "Move Action";
