@@ -6,7 +6,7 @@ using namespace std;
 
 //Studio* backup = nullptr;
 
-BaseAction *parseAction(const std::string &action_str, const Studio& studio)
+BaseAction *parseAction(const std::string &action_str, Studio& studio)
 {
     std::string action_type = action_str.substr(0, action_str.find(' '));
 
@@ -19,7 +19,7 @@ BaseAction *parseAction(const std::string &action_str, const Studio& studio)
         return Order::createOrder(data);
     }
     else if (action_type == ACTION_TYPE_MOVE_CUSTOMER_STR) {
-
+        return MoveCustomer::createMoveCustomer(data);
     }
     return nullptr;
 }
@@ -36,16 +36,18 @@ int main(int argc, char** argv){
     studio.getAll();
     string current_input;
     BaseAction *next_action;
-
     while (next_action != nullptr) {
         std::cout << "Please enter the next input" << std::endl;
         getline(cin, current_input);
         next_action = parseAction(current_input, studio);
-//        std::cout << studio.getTrainer(2)->toString() << std::endl;
         next_action->act(studio);
-//        cout << studio.getTrainer(2)->toString() << endl;
+        cout << studio.getTrainer(2)->toString() << endl;
+        cout << studio.getTrainer(0)->toString() << endl;
+
 //        next_action->act(studio);
+
     }
+
 
 
 

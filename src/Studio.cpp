@@ -85,6 +85,9 @@ void Studio::getAll()
 int Studio::getCurrentCustomerId() const {
     return next_customer_id;
 }
+void Studio::SetCurrentCustomerId(int increment_by) {
+    next_customer_id =+ increment_by;
+}
 
 int Studio::getNumOfTrainers() const {
     return trainers.size();
