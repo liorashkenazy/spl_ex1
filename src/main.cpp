@@ -32,6 +32,8 @@ BaseAction *parseAction(const std::string &action_str, Studio& studio)
     }
     else if (action_type == PrintActionsLog::name) {
         return new PrintActionsLog();
+    else if (action_type == ACTION_TYPE_MOVE_CUSTOMER_STR) {
+        return MoveCustomer::createMoveCustomer(data);
     }
     return nullptr;
 }
