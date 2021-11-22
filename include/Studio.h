@@ -19,6 +19,7 @@ public:
 	const std::vector<BaseAction*>& getActionsLog() const; // Return a reference to the history of actions
     std::vector<Workout>& getWorkoutOptions();
     int getCurrentCustomerId() const;
+    void SetCurrentCustomerId(int increment_by);
     // internal checking
     void getAll();
 private:

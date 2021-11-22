@@ -4,6 +4,7 @@
 
 #include <vector>
 #include <algorithm>
+#include <iostream>
 #include "Trainer.h"
 #include "Customer.h"
 #include "Workout.h"
@@ -37,10 +38,12 @@ Customer *Trainer::getCustomer(int id) {
 
 void Trainer::removeCustomer(int id) {
     // Remove the customer's orders
-    orderList.erase(std::remove_if(orderList.begin(),
-                                   orderList.end(),
-                                   [&id](const OrderPair &cur) { return cur.first == id; }),
-                    orderList.end());
+    std::vector<OrderPair> new_orderList;
+    for(OrderPair &cur:orderList){
+        if(cur.first != id)
+            new_orderList.push_back(cur);
+    }
+    std:: vector<OrderPair > orderList = new_orderList;
     // Remove the customer
     customersList.erase(std::remove(customersList.begin(), customersList.end(), getCustomer(id)));
 }
@@ -82,9 +85,12 @@ std::string Trainer::toString() const {
         }
 
         ret += "\nOrders:";
-//        for (const OrderPair &order : orderList) {
-//
-//        }
+        for (const OrderPair &order : orderList) {
+            ret += "\n";
+            ret += " " + std::to_string(order.second.getType());
+            ret += " " + std::to_string(order.second.getPrice()) + "NIS";
+            ret += " " + std::to_string(order.first);
+        }
         ret += "\nCurrent Trainer's Salary: ";
         ret += std::to_string(salary);
         ret += "NIS";

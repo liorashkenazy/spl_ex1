@@ -79,6 +79,7 @@ OpenTrainer::OpenTrainer(int id, std::vector<Customer *> &customersList) : train
 
 void OpenTrainer::act(Studio &studio)
 {
+    int increment_by(0);
     Trainer *pTrainer;
     if (studio.getNumOfTrainers() <= trainerId || trainerId < 0 || studio.getTrainer(trainerId)->isOpen()) {
         error("Workout session does not exist or is already open.");
@@ -91,8 +92,10 @@ void OpenTrainer::act(Studio &studio)
             break;
         }
         pTrainer->addCustomer(pCustomer);
+        increment_by++;
     }
     pTrainer->openTrainer();
+    studio.SetCurrentCustomerId(increment_by);
     complete();
 }
 
@@ -133,7 +136,7 @@ void MoveCustomer::act(Studio &studio)
     if (studio.getNumOfTrainers() <= srcTrainer || srcTrainer < 0 || !studio.getTrainer(srcTrainer)->isOpen() ||
         studio.getNumOfTrainers() <= dstTrainer || dstTrainer < 0 || !studio.getTrainer(dstTrainer)->isOpen() ||
         studio.getTrainer(dstTrainer)->getCapacity() <= studio.getTrainer(dstTrainer)->getCustomers().size() ||
-        studio.getTrainer(srcTrainer)->getCustomer(id) != nullptr) {
+        studio.getTrainer(srcTrainer)->getCustomer(id) == nullptr) {
         error("Cannot move customer");
         return;
     }
