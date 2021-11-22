@@ -21,9 +21,9 @@ void Studio::addWorkoutFromConfig(const std::string &workout_info, int workout_i
     std::string workout_type(workout_info.substr(first_delim_pos + 2, second_delim_pos - (first_delim_pos + 2)));
     WorkoutType w_type;
 
-    if (workout_type == ANAEROBIC_TYPE_STR) {
+    if (workout_type == Workout::typeToTypeStr[ANAEROBIC - ANAEROBIC]) {
         w_type = ANAEROBIC;
-    } else if (workout_type == MIXED_TYPE_STR) {
+    } else if (workout_type == Workout::typeToTypeStr[MIXED - ANAEROBIC]) {
         w_type = MIXED;
     } else {
         w_type = CARDIO;
@@ -86,7 +86,7 @@ int Studio::getCurrentCustomerId() const {
     return next_customer_id;
 }
 void Studio::SetCurrentCustomerId(int increment_by) {
-    next_customer_id =+ increment_by;
+    next_customer_id += increment_by;
 }
 
 int Studio::getNumOfTrainers() const {

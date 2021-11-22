@@ -40,10 +40,9 @@ void Trainer::removeCustomer(int id) {
     // Remove the customer's orders
     std::vector<OrderPair> new_orderList;
     for(OrderPair &cur:orderList){
-        if(cur.first != id)
-            new_orderList.push_back(cur);
+        if(cur.first == id)
+            cur.first = -1;
     }
-    std:: vector<OrderPair > orderList = new_orderList;
     // Remove the customer
     customersList.erase(std::remove(customersList.begin(), customersList.end(), getCustomer(id)));
 }
@@ -87,7 +86,7 @@ std::string Trainer::toString() const {
         ret += "\nOrders:";
         for (const OrderPair &order : orderList) {
             ret += "\n";
-            ret += " " + std::to_string(order.second.getType());
+            ret += " " + order.second.getName();
             ret += " " + std::to_string(order.second.getPrice()) + "NIS";
             ret += " " + std::to_string(order.first);
         }

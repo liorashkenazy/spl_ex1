@@ -41,9 +41,6 @@ int main(int argc, char** argv){
         getline(cin, current_input);
         next_action = parseAction(current_input, studio);
         next_action->act(studio);
-        cout << studio.getTrainer(2)->toString() << endl;
-        cout << studio.getTrainer(0)->toString() << endl;
-
 //        next_action->act(studio);
 
     }
