@@ -5,48 +5,42 @@
 #include "Studio.h"
 #include "Workout.h"
 #include "Action.h"
-#include "../include/Action.h"
 
-BaseAction::BaseAction() {
 
-}
+/************** BaseAction ***********/
+BaseAction::BaseAction() {}
 
-PrintWorkoutOptions::PrintWorkoutOptions() : BaseAction() {
-
+ActionStatus BaseAction::getStatus() const {
+    return status;
 }
 
 void BaseAction::complete() {
     status = COMPLETED;
 }
 
-ActionStatus BaseAction::getStatus() const {
-    return status;
-}
-
 void BaseAction::error(std::string errorMsg) {
     this->errorMsg = errorMsg;
-    std::cout << "Error: " << errorMsg;
+    std::cout << "Error: " << errorMsg << std::endl;
     status = ERROR;
 }
 
-void PrintWorkoutOptions::act(Studio& studio) {
-    for (const Workout& opt : studio.getWorkoutOptions()) {
-        std::cout << opt.toString() << std::endl;
-    }
-    complete();
+std::string BaseAction::getErrorMsg() const {
+    return errorMsg;
 }
 
-std::string PrintWorkoutOptions::toString() const {
-    return "Print workout options";
-}
+
+/************** OpenTrainer ***********/
+const std::string OpenTrainer::name = "open";
+
+OpenTrainer::OpenTrainer(int id, std::vector<Customer *> &customersList) : trainerId(id), customers(customersList) {}
 
 OpenTrainer *OpenTrainer::createOpenTrainerAction(const std::string &data, int next_customer_id) {
     std::vector<Customer *> customers;
-    size_t current_customer_index(0);
-    int trainer_id = std::stoi(data, &current_customer_index);
+    int trainer_id = std::stoi(data);
     int current_id = next_customer_id;
+    size_t current_customer_index = data.find(' ');
 
-    while (current_customer_index != std::string::npos) {
+    while (current_customer_index != std::string::npos && current_customer_index < data.size() - 1) {
         // Skip the space
         current_customer_index++;
 
@@ -70,12 +64,12 @@ OpenTrainer *OpenTrainer::createOpenTrainerAction(const std::string &data, int n
         }
 
         current_id++;
-    };
+    }
 
-    return new OpenTrainer(trainer_id, customers);
+    OpenTrainer *new_action = new OpenTrainer(trainer_id, customers);
+    new_action->action_args = data;
+    return new_action;
 }
-
-OpenTrainer::OpenTrainer(int id, std::vector<Customer *> &customersList) : trainerId(id), customers(customersList) {}
 
 void OpenTrainer::act(Studio &studio)
 {
@@ -99,14 +93,19 @@ void OpenTrainer::act(Studio &studio)
     complete();
 }
 
-std::string OpenTrainer::toString() const { return "Heyyy"; }
+std::string OpenTrainer::toString() const
+{
+    return name + " " + action_args + " " + (getStatus() == COMPLETED ? "completed" : "Error: " + getErrorMsg());
+}
+
+
+/************** Order ***********/
+const std::string Order::name = "order";
+
+Order::Order(int id) : trainerId(id) {}
 
 Order *Order::createOrder(const std::string &data) {
     return new Order(std::stoi(data));
-}
-
-std::string Order::toString() const {
-    return std::__cxx11::string();
 }
 
 void Order::act(Studio &studio) {
@@ -127,9 +126,29 @@ void Order::act(Studio &studio) {
     complete();
 }
 
-Order::Order(int id) : trainerId(id) {}
+std::string Order::toString() const
+{
+    return name + " " + std::to_string(trainerId) + " " +
+           (getStatus() == COMPLETED ? "completed" : "Error: " + getErrorMsg());
+}
+
+
+/************** MoveCustomer ***********/
+const std::string MoveCustomer::name = "move";
 
 MoveCustomer::MoveCustomer(int src, int dst, int customerId) : srcTrainer(src), dstTrainer(dst), id(customerId) {}
+
+MoveCustomer *MoveCustomer::createMoveCustomer(const std::string &data) {
+    size_t next_pos(0);
+    size_t current_pos(0);
+    int source_tid = std::stoi(data, &next_pos);
+    current_pos += next_pos + 1;
+    int dest_tid = std::stoi(data.substr(current_pos), &next_pos);
+    current_pos += next_pos + 1;
+    int customer_id = std::stoi(data.substr(current_pos));
+
+    return new MoveCustomer(source_tid, dest_tid, customer_id);
+}
 
 void MoveCustomer::act(Studio &studio)
 {
@@ -165,17 +184,103 @@ void MoveCustomer::act(Studio &studio)
 }
 
 std::string MoveCustomer::toString() const {
-    return "Move Action";
+    return name + " " +
+            std::to_string(srcTrainer) + " " +
+            std::to_string(dstTrainer) + " " +
+            std::to_string(id) + " " + (getStatus() == COMPLETED ? "completed" : "Error: " + getErrorMsg());
 }
 
-MoveCustomer *MoveCustomer::createMoveCustomer(const std::string &data) {
-    size_t next_pos(0);
-    size_t current_pos(0);
-    int source_tid = std::stoi(data, &next_pos);
-    current_pos += next_pos + 1;
-    int dest_tid = std::stoi(data.substr(current_pos), &next_pos);
-    current_pos += next_pos + 1;
-    int customer_id = std::stoi(data.substr(current_pos));
 
-    return new MoveCustomer(source_tid, dest_tid, customer_id);
+/************** Close ***********/
+const std::string Close::name = "close";
+
+Close::Close(int id) : trainerId(id) {}
+
+Close *Close::createClose(const std::string& data) {
+    return new Close(std::stoi(data));
 }
+
+void Close::act(Studio &studio) {
+    if (studio.getNumOfTrainers() <= trainerId || trainerId < 0 || !studio.getTrainer(trainerId)->isOpen()) {
+        error("Trainer does not exist or is not open");
+        return;
+    }
+
+    studio.getTrainer(trainerId)->closeTrainer();
+    std::cout << "Trainer " << std::to_string(trainerId) << " closed. Salary ";
+    std::cout << std::to_string(studio.getTrainer(trainerId)->getSalary()) << "NIS" << std::endl;
+}
+
+std::string Close::toString() const {
+    return name + " " + std::to_string(trainerId) + " " +
+           (getStatus() == COMPLETED ? "completed" : "Error: " + getErrorMsg());
+}
+
+
+/************** CloseAll ***********/
+const std::string CloseAll::name = "closeall";
+
+
+/************** PrintWorkoutOptions ***********/
+const std::string PrintWorkoutOptions::name = "workout_options";
+
+PrintWorkoutOptions::PrintWorkoutOptions() : BaseAction() {}
+
+void PrintWorkoutOptions::act(Studio& studio) {
+    for (const Workout& opt : studio.getWorkoutOptions()) {
+        std::cout << opt.toString() << std::endl;
+    }
+    complete();
+}
+
+std::string PrintWorkoutOptions::toString() const {
+    return name + " " + (getStatus() == COMPLETED ? "completed" : "Error: " + getErrorMsg());
+}
+
+
+/************** PrintTrainerStatus ***********/
+const std::string PrintTrainerStatus::name = "status";
+
+PrintTrainerStatus::PrintTrainerStatus(int id) : trainerId(id) {}
+
+PrintTrainerStatus *PrintTrainerStatus::createPrintTrainerStatus(const std::string& data) {
+    return new PrintTrainerStatus(std::stoi(data));
+}
+
+void PrintTrainerStatus::act(Studio &studio) {
+    if (studio.getNumOfTrainers() > trainerId && trainerId >= 0) {
+        std::cout << "Trainer " + std::to_string(trainerId) << " ";
+        std::cout << studio.getTrainer(trainerId)->toString() << std::endl;
+    }
+    complete();
+}
+
+std::string PrintTrainerStatus::toString() const {
+    return name + " " + std::to_string(trainerId) + " " +
+           (getStatus() == COMPLETED ? "completed" : "Error: " + getErrorMsg());
+}
+
+
+/************** PrintActionsLog ***********/
+const std::string PrintActionsLog::name = "log";
+
+PrintActionsLog::PrintActionsLog() {}
+
+void PrintActionsLog::act(Studio &studio) {
+    for (BaseAction *action : studio.getActionsLog()) {
+        std::cout << action->toString() << std::endl;
+    }
+    complete();
+}
+
+std::string PrintActionsLog::toString() const {
+    return name + " completed";
+}
+
+
+/************** BackupStudio ***********/
+const std::string BackupStudio::name = "backup";
+
+
+/************** RestoreStudio ***********/
+const std::string RestoreStudio::name = "restore";

@@ -20,6 +20,7 @@ Trainer::order(const int customer_id, const std::vector<int> workout_ids, const 
     std::vector<Workout> workouts(workout_options);
     for (int workout_id : workout_ids) {
         orderList.push_back(OrderPair(customer_id, workout_options.at(workout_id)));
+        salary += workout_options.at(workout_id).getPrice();
     }
 }
 
@@ -40,8 +41,10 @@ void Trainer::removeCustomer(int id) {
     // Remove the customer's orders
     std::vector<OrderPair> new_orderList;
     for(OrderPair &cur:orderList){
-        if(cur.first == id)
+        if (cur.first == id) {
             cur.first = -1;
+            salary -= cur.second.getPrice();
+        }
     }
     // Remove the customer
     customersList.erase(std::remove(customersList.begin(), customersList.end(), getCustomer(id)));
@@ -60,6 +63,8 @@ void Trainer::openTrainer() {
 }
 
 void Trainer::closeTrainer() {
+    orderList.clear();
+    clearCustomers();
     open = false;
 }
 
@@ -96,4 +101,11 @@ std::string Trainer::toString() const {
     }
 
     return ret;
+}
+
+void Trainer::clearCustomers() {
+    for (Customer *customer: customersList) {
+        delete customer;
+    }
+    customersList.clear();
 }

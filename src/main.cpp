@@ -11,15 +11,27 @@ BaseAction *parseAction(const std::string &action_str, Studio& studio)
     std::string action_type = action_str.substr(0, action_str.find(' '));
 
     std::string data = action_str.find(' ') == string::npos ? "": action_str.substr(action_str.find(' ') + 1);
-    if (action_type == ACTION_TYPE_OPEN_TRAINER_STR) {
+    if (action_type == OpenTrainer::name) {
         return OpenTrainer::createOpenTrainerAction(data,
                                                     studio.getCurrentCustomerId());
     }
-    else if (action_type == ACTION_TYPE_ORDER_STR) {
+    else if (action_type == Order::name) {
         return Order::createOrder(data);
     }
-    else if (action_type == ACTION_TYPE_MOVE_CUSTOMER_STR) {
+    else if (action_type == MoveCustomer::name) {
         return MoveCustomer::createMoveCustomer(data);
+    }
+    else if (action_type == Close::name) {
+        return Close::createClose(data);
+    }
+    else if (action_type == PrintWorkoutOptions::name) {
+        return new PrintWorkoutOptions();
+    }
+    else if (action_type == PrintTrainerStatus::name) {
+        return PrintTrainerStatus::createPrintTrainerStatus(data);
+    }
+    else if (action_type == PrintActionsLog::name) {
+        return new PrintActionsLog();
     }
     return nullptr;
 }
@@ -41,12 +53,9 @@ int main(int argc, char** argv){
         getline(cin, current_input);
         next_action = parseAction(current_input, studio);
         next_action->act(studio);
+        studio.addActionToLog(next_action);
 //        next_action->act(studio);
-
     }
-
-
-
 
 //    studio.start();
 //    if(backup!=nullptr){

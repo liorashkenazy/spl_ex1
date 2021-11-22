@@ -20,6 +20,7 @@ public:
     std::vector<Workout>& getWorkoutOptions();
     int getCurrentCustomerId() const;
     void SetCurrentCustomerId(int increment_by);
+    void addActionToLog(BaseAction *action);
     // internal checking
     void getAll();
 private:

@@ -96,3 +96,11 @@ int Studio::getNumOfTrainers() const {
 Trainer *Studio::getTrainer(int tid) {
     return trainers[tid];
 }
+
+const std::vector<BaseAction *> &Studio::getActionsLog() const {
+    return actionsLog;
+}
+
+void Studio::addActionToLog(BaseAction *action) {
+    actionsLog.push_back(action);
+}

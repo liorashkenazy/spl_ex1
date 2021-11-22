@@ -45,9 +45,11 @@ public:
     void act(Studio &studio);
     std::string toString() const;
     static OpenTrainer *createOpenTrainerAction(const std::string &data, int next_customer_id);
+    static const std::string name;
 private:
 	const int trainerId;
 	std::vector<Customer *> customers;
+    std::string action_args;
 };
 
 
@@ -57,6 +59,7 @@ public:
     void act(Studio &studio);
     std::string toString() const;
     static Order *createOrder(const std::string& data);
+    static const std::string name;
 private:
     const int trainerId;
 };
@@ -68,6 +71,7 @@ public:
     void act(Studio &studio);
     std::string toString() const;
     static MoveCustomer *createMoveCustomer(const std::string &data);
+    static const std::string name;
 private:
     const int srcTrainer;
     const int dstTrainer;
@@ -80,6 +84,8 @@ public:
     Close(int id);
     void act(Studio &studio);
     std::string toString() const;
+    static Close *createClose(const std::string& data);
+    static const std::string name;
 private:
     const int trainerId;
 };
@@ -90,6 +96,7 @@ public:
     CloseAll();
     void act(Studio &studio);
     std::string toString() const;
+    static const std::string name;
 private:
 };
 
@@ -99,6 +106,7 @@ public:
     PrintWorkoutOptions();
     void act(Studio &studio);
     std::string toString() const;
+    static const std::string name;
 private:
 };
 
@@ -108,6 +116,8 @@ public:
     PrintTrainerStatus(int id);
     void act(Studio &studio);
     std::string toString() const;
+    static PrintTrainerStatus *createPrintTrainerStatus(const std::string& data);
+    static const std::string name;
 private:
     const int trainerId;
 };
@@ -118,6 +128,7 @@ public:
     PrintActionsLog();
     void act(Studio &studio);
     std::string toString() const;
+    static const std::string name;
 private:
 };
 
@@ -127,6 +138,7 @@ public:
     BackupStudio();
     void act(Studio &studio);
     std::string toString() const;
+    static const std::string name;
 private:
 };
 
@@ -136,6 +148,7 @@ public:
     RestoreStudio();
     void act(Studio &studio);
     std::string toString() const;
+    static const std::string name;
 
 };
 
