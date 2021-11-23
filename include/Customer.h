@@ -3,15 +3,22 @@
 
 #include <vector>
 #include <string>
+#include <typeinfo>
 #include "Workout.h"
+
+#define CUSTOMER_TYPE_CHEAP_STR "chp"
+#define CUSTOMER_TYPE_SWEATY_STR "swt"
+#define CUSTOMER_TYPE_HEAVY_MUSCLE_STR "mcl"
+#define CUSTOMER_TYPE_FULL_BODY_STR "fbd"
 
 class Customer{
 public:
     Customer(std::string c_name, int c_id);
-    virtual std::vector<int> order(const std::vector<Workout> &workout_options)=0;
+    virtual std::vector<int> order(const std::vector<Workout> &workout_options) = 0;
     virtual std::string toString() const = 0;
     std::string getName() const;
     int getId() const;
+    virtual ~Customer();
 private:
     const std::string name;
     const int id;
@@ -52,6 +59,5 @@ public:
     std::string toString() const;
 private:
 };
-
 
 #endif

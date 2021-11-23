@@ -1,9 +1,10 @@
 #include "Studio.h"
+#include "Action.h"
 #include <iostream>
 
 using namespace std;
 
-//Studio* backup = nullptr;
+Studio* backup = nullptr;
 
 int main(int argc, char** argv){
 
@@ -12,12 +13,11 @@ int main(int argc, char** argv){
         return 0;
     }
     string configurationFile = argv[1];
-    Studio studio("config.txt");
-    studio.getAll();
-//    studio.start();
-//    if(backup!=nullptr){
-//    	delete backup;
-//    	backup = nullptr;
-//    }
+    Studio studio(configurationFile);
+    studio.start();
+    if(backup!=nullptr){
+    	delete backup;
+    	backup = nullptr;
+    }
     return 0;
 }
