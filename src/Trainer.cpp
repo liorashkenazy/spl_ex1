@@ -3,8 +3,8 @@
 //
 
 #include <vector>
-#include <algorithm>
 #include <iostream>
+#include <algorithm>
 #include "Trainer.h"
 #include "Customer.h"
 #include "Workout.h"
@@ -64,8 +64,10 @@ void Trainer::openTrainer() {
 
 void Trainer::closeTrainer() {
     orderList.clear();
-    clearCustomers();
+    freeCustomers();
+    customersList.clear();
     open = false;
+    std::cout << "Salary " << std::to_string(getSalary()) << "NIS" << std::endl;
 }
 
 bool Trainer::isOpen() {
@@ -90,8 +92,11 @@ std::string Trainer::toString() const {
 
         ret += "\nOrders:";
         for (const OrderPair &order : orderList) {
+            if (order.first == -1) {
+                continue;
+            }
             ret += "\n";
-            ret += " " + order.second.getName();
+            ret += order.second.getName();
             ret += " " + std::to_string(order.second.getPrice()) + "NIS";
             ret += " " + std::to_string(order.first);
         }
@@ -103,9 +108,35 @@ std::string Trainer::toString() const {
     return ret;
 }
 
-void Trainer::clearCustomers() {
+void Trainer::freeCustomers() {
     for (Customer *customer: customersList) {
         delete customer;
     }
-    customersList.clear();
+}
+
+Trainer::~Trainer() {
+    freeCustomers();
+}
+
+Trainer::Trainer(const Trainer &other) :
+    capacity(other.getCapacity()),
+    open(other.open),
+    customersList(),
+    orderList(other.orderList),
+    salary(other.salary)
+{
+    for (Customer *customer:other.customersList) {
+        if (typeid(*customer) == typeid(SweatyCustomer)) {
+            customersList.push_back(new SweatyCustomer(*dynamic_cast<SweatyCustomer *>(customer)));
+        }
+        else if (typeid(*customer) == typeid(FullBodyCustomer)) {
+            customersList.push_back(new FullBodyCustomer(*dynamic_cast<FullBodyCustomer *>(customer)));
+        }
+        else if (typeid(*customer) == typeid(CheapCustomer)) {
+            customersList.push_back(new CheapCustomer(*dynamic_cast<CheapCustomer *>(customer)));
+        }
+        else {
+            customersList.push_back(new HeavyMuscleCustomer(*dynamic_cast<HeavyMuscleCustomer *>(customer)));
+        }
+    }
 }

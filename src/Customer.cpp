@@ -5,10 +5,9 @@
 #include <algorithm>
 #include <iostream>
 #include "Customer.h"
-#include "../include/Customer.h"
 
-//#include "Workout.h"
 
+/************** Customer ***********/
 Customer::Customer(std::string c_name, int c_id) : name(c_name), id(c_id) {}
 
 std::string Customer::getName() const {
@@ -19,6 +18,9 @@ int Customer::getId() const {
     return id;
 }
 
+Customer::~Customer() {}
+
+/************** SweatyCustomer ***********/
 SweatyCustomer::SweatyCustomer(std::string name, int id) : Customer(name, id) {}
 
 std::vector<int> SweatyCustomer::order(const std::vector<Workout> &workout_options) {
@@ -36,6 +38,8 @@ std::string SweatyCustomer::toString() const {
     return "Sweaty Customer";
 }
 
+
+/************** CheapCustomer ***********/
 CheapCustomer::CheapCustomer(std::string name, int id) : Customer(name, id) {}
 
 bool compareCheapPrice(const Workout &a, const Workout &b)
@@ -54,6 +58,8 @@ std::string CheapCustomer::toString() const {
     return std::__cxx11::string();
 }
 
+
+/************** HeavyMuscleCustomer ***********/
 HeavyMuscleCustomer::HeavyMuscleCustomer(std::string name, int id) : Customer(name, id) {}
 
 bool compareMostExpensiveOption(std::pair<int, int> a, std::pair<int, int> b)
@@ -82,12 +88,14 @@ std::string HeavyMuscleCustomer::toString() const {
     return std::__cxx11::string();
 }
 
+
+/************** FullBodyCustomer ***********/
+FullBodyCustomer::FullBodyCustomer(std::string name, int id) : Customer(name, id) {}
+
 bool compareCheapestOption(std::pair<int, int> a, std::pair<int, int> b)
 {
     return !compareMostExpensiveOption(a,b);
 }
-
-FullBodyCustomer::FullBodyCustomer(std::string name, int id) : Customer(name, id) {}
 
 std::vector<int> FullBodyCustomer::order(const std::vector<Workout> &workout_options) {
     std::vector<int> orders;

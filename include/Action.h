@@ -3,6 +3,7 @@
 
 #include <string>
 #include <iostream>
+#include <typeinfo>
 #include "Customer.h"
 
 #define ACTION_TYPE_OPEN_TRAINER_STR "open"
@@ -29,6 +30,7 @@ public:
     ActionStatus getStatus() const;
     virtual void act(Studio& studio)=0;
     virtual std::string toString() const=0;
+    virtual ~BaseAction() = default;
 protected:
     void complete();
     void error(std::string errorMsg);
@@ -46,6 +48,7 @@ public:
     std::string toString() const;
     static OpenTrainer *createOpenTrainerAction(const std::string &data, int next_customer_id);
     static const std::string name;
+    virtual ~OpenTrainer();
 private:
 	const int trainerId;
 	std::vector<Customer *> customers;

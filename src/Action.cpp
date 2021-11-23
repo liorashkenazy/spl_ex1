@@ -6,9 +6,10 @@
 #include "Workout.h"
 #include "Action.h"
 
+extern Studio *backup;
 
 /************** BaseAction ***********/
-BaseAction::BaseAction() {}
+BaseAction::BaseAction() : errorMsg(), status(ERROR) {}
 
 ActionStatus BaseAction::getStatus() const {
     return status;
@@ -32,7 +33,10 @@ std::string BaseAction::getErrorMsg() const {
 /************** OpenTrainer ***********/
 const std::string OpenTrainer::name = "open";
 
-OpenTrainer::OpenTrainer(int id, std::vector<Customer *> &customersList) : trainerId(id), customers(customersList) {}
+OpenTrainer::OpenTrainer(int id, std::vector<Customer *> &customersList) :
+    trainerId(id),
+    customers(customersList),
+    action_args() {}
 
 OpenTrainer *OpenTrainer::createOpenTrainerAction(const std::string &data, int next_customer_id) {
     std::vector<Customer *> customers;
@@ -85,9 +89,12 @@ void OpenTrainer::act(Studio &studio)
         if (pTrainer->getCapacity() <= pTrainer->getCustomers().size()) {
             break;
         }
+        // Transfer ownership
         pTrainer->addCustomer(pCustomer);
         increment_by++;
     }
+    customers.clear();
+
     pTrainer->openTrainer();
     studio.SetCurrentCustomerId(increment_by);
     complete();
@@ -96,6 +103,13 @@ void OpenTrainer::act(Studio &studio)
 std::string OpenTrainer::toString() const
 {
     return name + " " + action_args + " " + (getStatus() == COMPLETED ? "completed" : "Error: " + getErrorMsg());
+}
+
+OpenTrainer::~OpenTrainer()
+{
+    for (Customer *customer:customers) {
+        delete customer;
+    }
 }
 
 
@@ -206,9 +220,8 @@ void Close::act(Studio &studio) {
         return;
     }
 
+    std::cout << "Trainer " << std::to_string(trainerId) << " closed. ";
     studio.getTrainer(trainerId)->closeTrainer();
-    std::cout << "Trainer " << std::to_string(trainerId) << " closed. Salary ";
-    std::cout << std::to_string(studio.getTrainer(trainerId)->getSalary()) << "NIS" << std::endl;
 }
 
 std::string Close::toString() const {
@@ -219,6 +232,24 @@ std::string Close::toString() const {
 
 /************** CloseAll ***********/
 const std::string CloseAll::name = "closeall";
+
+CloseAll::CloseAll() {}
+
+void CloseAll::act(Studio &studio)
+{
+    for (int i = 0; i < studio.getNumOfTrainers(); i++) {
+        Trainer *trainer = studio.getTrainer(i);
+        if (trainer->isOpen()) {
+            std::cout << "Trainer " << std::to_string(i) << " closed. ";
+            trainer->closeTrainer();
+        }
+    }
+    studio.close();
+}
+
+std::string CloseAll::toString() const {
+    return name + " completed";
+}
 
 
 /************** PrintWorkoutOptions ***********/
@@ -281,6 +312,37 @@ std::string PrintActionsLog::toString() const {
 /************** BackupStudio ***********/
 const std::string BackupStudio::name = "backup";
 
+BackupStudio::BackupStudio() {}
+
+void BackupStudio::act(Studio &studio) {
+    if (backup != nullptr) {
+        delete backup;
+        backup = nullptr;
+    }
+
+    backup = new Studio(studio);
+    complete();
+}
+
+std::string BackupStudio::toString() const {
+    return name + " completed";
+}
+
 
 /************** RestoreStudio ***********/
 const std::string RestoreStudio::name = "restore";
+
+RestoreStudio::RestoreStudio() {}
+
+void RestoreStudio::act(Studio &studio) {
+    if (backup == nullptr) {
+        error("No backup available");
+        return;
+    }
+    studio = *backup;
+    complete();
+}
+
+std::string RestoreStudio::toString() const {
+    return name + (getStatus() == COMPLETED ? "completed" : "Error: " + getErrorMsg());
+}

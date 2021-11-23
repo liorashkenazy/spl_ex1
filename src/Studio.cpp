@@ -6,10 +6,13 @@
 #include <fstream>
 #include <vector>
 #include <string>
+#include <typeinfo>
 #include "Studio.h"
 #include "Workout.h"
 #include "Trainer.h"
 #include "Action.h"
+
+using namespace std;
 
 std::vector<Workout>& Studio::getWorkoutOptions() { return workout_options; }
 
@@ -71,15 +74,35 @@ Studio::Studio(const std::string &configFilePath):
         }
     }
 }
-void Studio::getAll()
-{
-    PrintWorkoutOptions print_action;
-    std::cout << "Number of trainers: " << trainers.size() << std::endl;
-    for (size_t i = 0; i < trainers.size(); i++) {
-        std::cout << "Trainer[" << i << "], capacity: " << trainers.at(i)->getCapacity() << std::endl;
-    }
 
-    print_action.act(*this);
+Studio::Studio(const Studio &other) :
+    open(other.open),
+    trainers(),
+    workout_options(other.workout_options),
+    actionsLog(),
+    next_customer_id(other.getCurrentCustomerId())
+{
+    for (Trainer *trainer:other.trainers) {
+        trainers.push_back(new Trainer(*trainer));
+    }
+    copyActionsLog(other);
+}
+
+Studio &Studio::operator=(const Studio& other) {
+    if (this != &other) {
+        clear();
+        open = other.open;
+        workout_options.clear();
+        for (const Workout &workout:other.workout_options) {
+            workout_options.push_back(workout);
+        }
+        next_customer_id = other.next_customer_id;
+        for (Trainer *trainer:other.trainers) {
+            trainers.push_back(new Trainer(*trainer));
+        }
+        copyActionsLog(other);
+    }
+    return *this;
 }
 
 int Studio::getCurrentCustomerId() const {
@@ -103,4 +126,112 @@ const std::vector<BaseAction *> &Studio::getActionsLog() const {
 
 void Studio::addActionToLog(BaseAction *action) {
     actionsLog.push_back(action);
+}
+
+BaseAction * Studio::parseAction(const std::string &action_str)
+{
+    std::string action_type = action_str.substr(0, action_str.find(' '));
+
+    std::string data = action_str.find(' ') == string::npos ? "": action_str.substr(action_str.find(' ') + 1);
+    if (action_type == OpenTrainer::name) {
+        return OpenTrainer::createOpenTrainerAction(data, getCurrentCustomerId());
+    }
+    else if (action_type == Order::name) {
+        return Order::createOrder(data);
+    }
+    else if (action_type == MoveCustomer::name) {
+        return MoveCustomer::createMoveCustomer(data);
+    }
+    else if (action_type == Close::name) {
+        return Close::createClose(data);
+    }
+    else if (action_type == CloseAll::name) {
+        return new CloseAll();
+    }
+    else if (action_type == PrintWorkoutOptions::name) {
+        return new PrintWorkoutOptions();
+    }
+    else if (action_type == PrintTrainerStatus::name) {
+        return PrintTrainerStatus::createPrintTrainerStatus(data);
+    }
+    else if (action_type == PrintActionsLog::name) {
+        return new PrintActionsLog();
+    }
+    else if (action_type == BackupStudio::name) {
+        return new BackupStudio();
+    }
+    else if (action_type == RestoreStudio::name) {
+        return new RestoreStudio();
+    }
+    return nullptr;
+}
+
+void Studio::start()
+{
+    open = true;
+    cout << "Studio is now open!" << endl;
+
+    while (open) {
+        cout << "Please enter the next input" << endl;
+        string current_input;
+        getline(cin, current_input);
+        BaseAction *next_action = parseAction(current_input);
+        next_action->act(*this);
+        addActionToLog(next_action);
+    }
+}
+
+void Studio::clear() {
+    for (Trainer *trainer: trainers) {
+        delete trainer;
+    }
+    trainers.clear();
+    for (BaseAction *action:actionsLog) {
+        delete action;
+    }
+    actionsLog.clear();
+}
+
+void Studio::copyActionsLog(const Studio &other)
+{
+    for (BaseAction *action:other.getActionsLog()) {
+        if (typeid(*action) == typeid(OpenTrainer)) {
+            actionsLog.push_back(new OpenTrainer(*dynamic_cast<OpenTrainer *>(action)));
+        }
+        else if (typeid(*action) == typeid(Order)) {
+            actionsLog.push_back(new Order(*dynamic_cast<Order *>(action)));
+        }
+        else if (typeid(*action) == typeid(MoveCustomer)) {
+            actionsLog.push_back(new MoveCustomer(*dynamic_cast<MoveCustomer *>(action)));
+        }
+        else if (typeid(*action) == typeid(Close)) {
+            actionsLog.push_back(new Close(*dynamic_cast<Close *>(action)));
+        }
+        else if (typeid(*action) == typeid(CloseAll)) {
+            actionsLog.push_back(new CloseAll(*dynamic_cast<CloseAll *>(action)));
+        }
+        else if (typeid(*action) == typeid(PrintWorkoutOptions)) {
+            actionsLog.push_back(new PrintWorkoutOptions(*dynamic_cast<PrintWorkoutOptions *>(action)));
+        }
+        else if (typeid(*action) == typeid(PrintTrainerStatus)) {
+            actionsLog.push_back(new PrintTrainerStatus(*dynamic_cast<PrintTrainerStatus *>(action)));
+        }
+        else if (typeid(*action) == typeid(PrintActionsLog)) {
+            actionsLog.push_back(new PrintActionsLog(*dynamic_cast<PrintActionsLog *>(action)));
+        }
+        else if (typeid(*action) == typeid(BackupStudio)) {
+            actionsLog.push_back(new BackupStudio(*dynamic_cast<BackupStudio *>(action)));
+        }
+        else if (typeid(*action) == typeid(RestoreStudio)) {
+            actionsLog.push_back(new RestoreStudio(*dynamic_cast<RestoreStudio *>(action)));
+        }
+    }
+}
+
+Studio::~Studio() {
+    clear();
+}
+
+void Studio::close() {
+    open = false;
 }
