@@ -222,6 +222,7 @@ void Close::act(Studio &studio) {
 
     std::cout << "Trainer " << std::to_string(trainerId) << " closed. ";
     studio.getTrainer(trainerId)->closeTrainer();
+    complete();
 }
 
 std::string Close::toString() const {
@@ -245,6 +246,7 @@ void CloseAll::act(Studio &studio)
         }
     }
     studio.close();
+    complete();
 }
 
 std::string CloseAll::toString() const {
@@ -265,7 +267,7 @@ void PrintWorkoutOptions::act(Studio& studio) {
 }
 
 std::string PrintWorkoutOptions::toString() const {
-    return name + " " + (getStatus() == COMPLETED ? "completed" : "Error: " + getErrorMsg());
+    return name + " completed";
 }
 
 
