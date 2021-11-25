@@ -168,7 +168,7 @@ void MoveCustomer::act(Studio &studio)
 {
     if (studio.getNumOfTrainers() <= srcTrainer || srcTrainer < 0 || !studio.getTrainer(srcTrainer)->isOpen() ||
         studio.getNumOfTrainers() <= dstTrainer || dstTrainer < 0 || !studio.getTrainer(dstTrainer)->isOpen() ||
-        studio.getTrainer(dstTrainer)->getCapacity() <= static_cast<int> (studio.getTrainer(dstTrainer)->getCustomers().size()) ||
+        studio.getTrainer(dstTrainer)->getCapacity() <= static_cast<int>(studio.getTrainer(dstTrainer)->getCustomers().size()) ||
         studio.getTrainer(srcTrainer)->getCustomer(id) == nullptr) {
         error("Cannot move customer");
         return;
