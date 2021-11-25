@@ -86,8 +86,7 @@ std::string Trainer::toString() const {
 
         for (const Customer* customer: customersList) {
             ret += "\n";
-            ret += std::to_string(customer->getId());
-            ret += " " + customer->getName();
+            ret += customer->toString();
         }
 
         ret += "\nOrders:";

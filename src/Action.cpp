@@ -55,16 +55,16 @@ OpenTrainer *OpenTrainer::createOpenTrainerAction(const std::string &data, int n
         std::string c_type = data.substr(next_delim_index + 1, current_customer_index - (next_delim_index + 1));
 
         if (c_type == CUSTOMER_TYPE_CHEAP_STR) {
-            customers.emplace_back(new CheapCustomer(c_name, current_id));
+            customers.push_back(new CheapCustomer(c_name, current_id));
         }
         else if (c_type == CUSTOMER_TYPE_FULL_BODY_STR) {
-            customers.emplace_back(new FullBodyCustomer(c_name, current_id));
+            customers.push_back(new FullBodyCustomer(c_name, current_id));
         }
         else if (c_type == CUSTOMER_TYPE_SWEATY_STR) {
-            customers.emplace_back(new SweatyCustomer(c_name, current_id));
+            customers.push_back(new SweatyCustomer(c_name, current_id));
         }
         else if (c_type == CUSTOMER_TYPE_HEAVY_MUSCLE_STR) {
-            customers.emplace_back(new HeavyMuscleCustomer(c_name, current_id));
+            customers.push_back(new HeavyMuscleCustomer(c_name, current_id));
         }
 
         current_id++;
@@ -222,6 +222,7 @@ void Close::act(Studio &studio) {
 
     std::cout << "Trainer " << std::to_string(trainerId) << " closed. ";
     studio.getTrainer(trainerId)->closeTrainer();
+    complete();
 }
 
 std::string Close::toString() const {
@@ -245,6 +246,7 @@ void CloseAll::act(Studio &studio)
         }
     }
     studio.close();
+    complete();
 }
 
 std::string CloseAll::toString() const {
@@ -265,7 +267,7 @@ void PrintWorkoutOptions::act(Studio& studio) {
 }
 
 std::string PrintWorkoutOptions::toString() const {
-    return name + " " + (getStatus() == COMPLETED ? "completed" : "Error: " + getErrorMsg());
+    return name + " completed";
 }
 
 
