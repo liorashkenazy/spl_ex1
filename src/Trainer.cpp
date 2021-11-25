@@ -9,8 +9,10 @@
 #include "Customer.h"
 #include "Workout.h"
 
+// Constructor
 Trainer::Trainer(int t_capacity): capacity(t_capacity), open(false), customersList(), orderList(), salary(0) {}
 
+// Copy constructor
 Trainer::Trainer(const Trainer &other) :
         capacity(other.getCapacity()),
         open(other.open),
