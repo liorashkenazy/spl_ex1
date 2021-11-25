@@ -6,7 +6,6 @@
 #include <fstream>
 #include <vector>
 #include <string>
-#include <typeinfo>
 #include "Studio.h"
 #include "Workout.h"
 #include "Trainer.h"
