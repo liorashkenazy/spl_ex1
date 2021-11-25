@@ -86,7 +86,7 @@ void OpenTrainer::act(Studio &studio)
 
     pTrainer = studio.getTrainer(trainerId);
     for (Customer *pCustomer: customers) {
-        if (pTrainer->getCapacity() <= pTrainer->getCustomers().size()) {
+        if (pTrainer->getCapacity() <= static_cast<int>(pTrainer->getCustomers().size())) {
             break;
         }
         // Transfer ownership
@@ -168,7 +168,7 @@ void MoveCustomer::act(Studio &studio)
 {
     if (studio.getNumOfTrainers() <= srcTrainer || srcTrainer < 0 || !studio.getTrainer(srcTrainer)->isOpen() ||
         studio.getNumOfTrainers() <= dstTrainer || dstTrainer < 0 || !studio.getTrainer(dstTrainer)->isOpen() ||
-        studio.getTrainer(dstTrainer)->getCapacity() <= studio.getTrainer(dstTrainer)->getCustomers().size() ||
+        studio.getTrainer(dstTrainer)->getCapacity() <= static_cast<int>(studio.getTrainer(dstTrainer)->getCustomers().size()) ||
         studio.getTrainer(srcTrainer)->getCustomer(id) == nullptr) {
         error("Cannot move customer");
         return;
@@ -191,6 +191,7 @@ void MoveCustomer::act(Studio &studio)
     pDstTrainer->order(id, orders, studio.getWorkoutOptions());
 
     if (pSrcTrainer->getCustomers().size() == 0) {
+        std::cout << "Trainer " << srcTrainer << " closed. ";
         pSrcTrainer->closeTrainer();
     }
 
