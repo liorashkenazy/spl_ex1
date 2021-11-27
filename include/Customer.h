@@ -31,6 +31,8 @@ public:
 	SweatyCustomer(std::string name, int id);
     std::vector<int> order(const std::vector<Workout> &workout_options);
     std::string toString() const;
+
+    static const std::string type_str;
 private:
 };
 
@@ -40,6 +42,8 @@ public:
 	CheapCustomer(std::string name, int id);
     std::vector<int> order(const std::vector<Workout> &workout_options);
     std::string toString() const;
+
+    static const std::string type_str;
 private:
 };
 
@@ -49,6 +53,8 @@ public:
 	HeavyMuscleCustomer(std::string name, int id);
     std::vector<int> order(const std::vector<Workout> &workout_options);
     std::string toString() const;
+
+    static const std::string type_str;
 private:
 };
 
@@ -58,6 +64,8 @@ public:
 	FullBodyCustomer(std::string name, int id);
     std::vector<int> order(const std::vector<Workout> &workout_options);
     std::string toString() const;
+
+    static const std::string type_str;
 private:
 };
 

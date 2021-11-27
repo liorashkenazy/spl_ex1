@@ -34,9 +34,9 @@ std::string BaseAction::getErrorMsg() const {
 const std::string OpenTrainer::name = "open";
 
 OpenTrainer::OpenTrainer(int id, std::vector<Customer *> &customersList) :
-    trainerId(id),
-    customers(customersList),
-    action_args() {}
+        trainerId(id),
+        customers(customersList),
+        added_customers() {}
 
 OpenTrainer *OpenTrainer::createOpenTrainerAction(const std::string &data, int next_customer_id) {
     std::vector<Customer *> customers;
@@ -56,25 +56,23 @@ OpenTrainer *OpenTrainer::createOpenTrainerAction(const std::string &data, int n
         current_customer_index = data.find(' ', next_delim_index);
         std::string c_type = data.substr(next_delim_index + 1, current_customer_index - (next_delim_index + 1));
 
-        if (c_type == CUSTOMER_TYPE_CHEAP_STR) {
+        if (c_type == CheapCustomer::type_str) {
             customers.push_back(new CheapCustomer(c_name, current_id));
         }
-        else if (c_type == CUSTOMER_TYPE_FULL_BODY_STR) {
+        else if (c_type == FullBodyCustomer::type_str) {
             customers.push_back(new FullBodyCustomer(c_name, current_id));
         }
-        else if (c_type == CUSTOMER_TYPE_SWEATY_STR) {
+        else if (c_type == SweatyCustomer::type_str) {
             customers.push_back(new SweatyCustomer(c_name, current_id));
         }
-        else if (c_type == CUSTOMER_TYPE_HEAVY_MUSCLE_STR) {
+        else if (c_type == HeavyMuscleCustomer::type_str) {
             customers.push_back(new HeavyMuscleCustomer(c_name, current_id));
         }
 
         current_id++;
     }
 
-    OpenTrainer *new_action = new OpenTrainer(trainer_id, customers);
-    new_action->action_args = data;
-    return new_action;
+    return new OpenTrainer(trainer_id, customers);
 }
 
 void OpenTrainer::act(Studio &studio)
@@ -99,6 +97,8 @@ void OpenTrainer::act(Studio &studio)
             if (pCustomer->getId() > last_customer_id) {
                 last_customer_id = pCustomer->getId();
             }
+            // Save the customers that were actually added to display in the log
+            added_customers += " " + pCustomer->toString();
         }
     }
     // Clear the list of customers to indicate they are no longer owned by us
@@ -111,7 +111,10 @@ void OpenTrainer::act(Studio &studio)
 
 std::string OpenTrainer::toString() const
 {
-    return name + " " + action_args + " " + (getStatus() == COMPLETED ? "completed" : "Error: " + getErrorMsg());
+    return name + " " +
+           std::to_string(trainerId) +
+           added_customers + " " +
+           (getStatus() == COMPLETED ? "completed" : "Error: " + getErrorMsg());
 }
 
 OpenTrainer::~OpenTrainer()

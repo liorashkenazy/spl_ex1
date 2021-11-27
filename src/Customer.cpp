@@ -21,6 +21,8 @@ int Customer::getId() const {
 Customer::~Customer() {}
 
 /************** SweatyCustomer ***********/
+const std::string SweatyCustomer::type_str = "swt";
+
 SweatyCustomer::SweatyCustomer(std::string name, int id) : Customer(name, id) {}
 
 std::vector<int> SweatyCustomer::order(const std::vector<Workout> &workout_options) {
@@ -35,11 +37,13 @@ std::vector<int> SweatyCustomer::order(const std::vector<Workout> &workout_optio
 }
 
 std::string SweatyCustomer::toString() const {
-    return std::to_string(getId()) + " " + getName();
+    return getName() + "," + type_str;
 }
 
 
 /************** CheapCustomer ***********/
+const std::string CheapCustomer::type_str = "chp";
+
 CheapCustomer::CheapCustomer(std::string name, int id) : Customer(name, id) {}
 
 // A comparator that returns the cheapest workout
@@ -60,11 +64,13 @@ std::vector<int> CheapCustomer::order(const std::vector<Workout> &workout_option
 }
 
 std::string CheapCustomer::toString() const {
-    return std::to_string(getId()) + " " + getName();
+    return getName() + "," + type_str;
 }
 
 
 /************** HeavyMuscleCustomer ***********/
+const std::string HeavyMuscleCustomer::type_str = "mcl";
+
 HeavyMuscleCustomer::HeavyMuscleCustomer(std::string name, int id) : Customer(name, id) {}
 
 // A comparator that returns the most expensive option
@@ -95,11 +101,13 @@ std::vector<int> HeavyMuscleCustomer::order(const std::vector<Workout> &workout_
 }
 
 std::string HeavyMuscleCustomer::toString() const {
-    return std::to_string(getId()) + " " + getName();
+    return getName() + "," + type_str;
 }
 
 
 /************** FullBodyCustomer ***********/
+const std::string FullBodyCustomer::type_str = "fbd";
+
 FullBodyCustomer::FullBodyCustomer(std::string name, int id) : Customer(name, id) {}
 
 std::vector<int> FullBodyCustomer::order(const std::vector<Workout> &workout_options) {
@@ -144,5 +152,5 @@ std::vector<int> FullBodyCustomer::order(const std::vector<Workout> &workout_opt
 }
 
 std::string FullBodyCustomer::toString() const {
-    return std::to_string(getId()) + " " + getName();
+    return getName() + "," + type_str;
 }

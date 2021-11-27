@@ -51,7 +51,8 @@ public:
 private:
 	const int trainerId;
 	std::vector<Customer *> customers;
-    std::string action_args;
+    // String representation of the successfully added customers, to display in the logs
+    std::string added_customers;
 };
 
 
