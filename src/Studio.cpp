@@ -6,7 +6,6 @@
 #include <fstream>
 #include <vector>
 #include <string>
-#include <typeinfo>
 #include "Studio.h"
 #include "Workout.h"
 #include "Trainer.h"
@@ -14,30 +13,7 @@
 
 using namespace std;
 
-std::vector<Workout>& Studio::getWorkoutOptions() { return workout_options; }
-
-void Studio::addWorkoutFromConfig(const std::string &workout_info, int workout_id)
-{
-    size_t first_delim_pos(workout_info.find(','));
-    size_t second_delim_pos(workout_info.find(',', first_delim_pos+1));
-    std::string workout_name(workout_info.substr(0, first_delim_pos));
-    std::string workout_type(workout_info.substr(first_delim_pos + 2, second_delim_pos - (first_delim_pos + 2)));
-    WorkoutType w_type;
-
-    if (workout_type == Workout::typeToTypeStr[ANAEROBIC - ANAEROBIC]) {
-        w_type = ANAEROBIC;
-    } else if (workout_type == Workout::typeToTypeStr[MIXED - ANAEROBIC]) {
-        w_type = MIXED;
-    } else {
-        w_type = CARDIO;
-    }
-
-    workout_options.emplace_back(Workout(workout_id,
-                                         workout_name,
-                                         std::stoi(workout_info.substr(second_delim_pos + 2)),
-                                         w_type));
-}
-
+// Constructor
 Studio::Studio(const std::string &configFilePath):
         open(false), trainers(), workout_options(), actionsLog(), next_customer_id(0)
 {
@@ -75,6 +51,7 @@ Studio::Studio(const std::string &configFilePath):
     }
 }
 
+// Copy constructor
 Studio::Studio(const Studio &other) :
     open(other.open),
     trainers(),
@@ -88,14 +65,36 @@ Studio::Studio(const Studio &other) :
     copyActionsLog(other);
 }
 
+// Move constructor
+Studio::Studio(Studio &&other) :
+        open(other.open),
+        trainers(),
+        workout_options(other.workout_options),
+        actionsLog(),
+        next_customer_id(other.getCurrentCustomerId())
+{
+    for (Trainer *trainer:other.trainers) {
+        trainers.push_back(trainer);
+    }
+    other.trainers.clear();
+
+    for (BaseAction *action : other.actionsLog) {
+        actionsLog.push_back(action);
+    }
+    other.actionsLog.clear();
+}
+
+// Copy assignment operator
 Studio &Studio::operator=(const Studio& other) {
     if (this != &other) {
         clear();
         open = other.open;
+
         workout_options.clear();
         for (const Workout &workout:other.workout_options) {
             workout_options.push_back(workout);
         }
+
         next_customer_id = other.next_customer_id;
         for (Trainer *trainer:other.trainers) {
             trainers.push_back(new Trainer(*trainer));
@@ -103,6 +102,53 @@ Studio &Studio::operator=(const Studio& other) {
         copyActionsLog(other);
     }
     return *this;
+}
+
+// Move assignment operator
+Studio &Studio::operator=(Studio &&other) {
+    clear();
+    open = other.open;
+    workout_options.clear();
+    for (const Workout &workout:other.workout_options) {
+        workout_options.push_back(workout);
+    }
+
+    next_customer_id = other.next_customer_id;
+    for (Trainer *trainer:other.trainers) {
+        trainers.push_back(trainer);
+    }
+    other.trainers.clear();
+
+    for (BaseAction *action : other.actionsLog) {
+        actionsLog.push_back(action);
+    }
+    other.actionsLog.clear();
+
+    return *this;
+}
+
+std::vector<Workout>& Studio::getWorkoutOptions() { return workout_options; }
+
+void Studio::addWorkoutFromConfig(const std::string &workout_info, int workout_id)
+{
+    size_t first_delim_pos(workout_info.find(','));
+    size_t second_delim_pos(workout_info.find(',', first_delim_pos+1));
+    std::string workout_name(workout_info.substr(0, first_delim_pos));
+    std::string workout_type(workout_info.substr(first_delim_pos + 2, second_delim_pos - (first_delim_pos + 2)));
+    WorkoutType w_type;
+
+    if (workout_type == Workout::typeToTypeStr[ANAEROBIC - ANAEROBIC]) {
+        w_type = ANAEROBIC;
+    } else if (workout_type == Workout::typeToTypeStr[MIXED - ANAEROBIC]) {
+        w_type = MIXED;
+    } else {
+        w_type = CARDIO;
+    }
+
+    workout_options.emplace_back(workout_id,
+                                 workout_name,
+                                 std::stoi(workout_info.substr(second_delim_pos + 2)),
+                                 w_type);
 }
 
 int Studio::getCurrentCustomerId() const {

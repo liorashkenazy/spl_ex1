@@ -9,17 +9,100 @@
 #include "Customer.h"
 #include "Workout.h"
 
+// Constructor
 Trainer::Trainer(int t_capacity): capacity(t_capacity), open(false), customersList(), orderList(), salary(0) {}
 
-int Trainer::getCapacity() const{
+// Copy constructor
+Trainer::Trainer(const Trainer &other) :
+        capacity(other.getCapacity()),
+        open(other.open),
+        customersList(),
+        orderList(other.orderList),
+        salary(other.salary)
+{
+    copyCustomer(other.customersList);
+}
+
+// Move constructor
+Trainer::Trainer(Trainer&& other) :
+        capacity(other.getCapacity()),
+        open(other.open),
+        customersList(),
+        orderList(other.orderList),
+        salary(other.salary)
+{
+    for (Customer *customer : other.customersList) {
+        customersList.push_back(customer);
+    }
+    other.customersList.clear();
+}
+
+// Copy assignment operator
+Trainer& Trainer::operator=(const Trainer& other) {
+    if (this != &other) {
+        capacity = other.getCapacity();
+        open = other.open;
+
+        freeCustomers();
+        customersList.clear();
+        copyCustomer(other.customersList);
+
+        orderList.clear();
+        for(OrderPair order:other.orderList){
+            orderList.push_back(OrderPair(order.first, order.second));
+        }
+
+        salary = other.salary;
+    }
+    return *this;
+}
+
+// Move assignment operator
+Trainer& Trainer::operator=(Trainer&& other) {
+    capacity = other.getCapacity();
+    open = other.open;
+
+    freeCustomers();
+    customersList.clear();
+    for (Customer *customer : other.customersList) {
+        customersList.push_back(customer);
+    }
+    other.customersList.clear();
+
+    orderList.clear();
+    for (OrderPair order:other.orderList) {
+        orderList.emplace_back(order.first, order.second);
+    }
+
+    salary = other.salary;
+    return *this;
+}
+
+void Trainer::copyCustomer(const std::vector<Customer*>& otherCustomersList) {
+    for (Customer *customer:otherCustomersList) {
+        if (typeid(*customer) == typeid(SweatyCustomer)) {
+            customersList.push_back(new SweatyCustomer(*dynamic_cast<SweatyCustomer *>(customer)));
+        }
+        else if (typeid(*customer) == typeid(FullBodyCustomer)) {
+            customersList.push_back(new FullBodyCustomer(*dynamic_cast<FullBodyCustomer *>(customer)));
+        }
+        else if (typeid(*customer) == typeid(CheapCustomer)) {
+            customersList.push_back(new CheapCustomer(*dynamic_cast<CheapCustomer *>(customer)));
+        }
+        else {
+            customersList.push_back(new HeavyMuscleCustomer(*dynamic_cast<HeavyMuscleCustomer *>(customer)));
+        }
+    }
+}
+
+int Trainer::getCapacity() const {
     return capacity;
 }
 
-void
-Trainer::order(const int customer_id, const std::vector<int> workout_ids, const std::vector<Workout> &workout_options) {
+void Trainer::order(const int customer_id, const std::vector<int> workout_ids, const std::vector<Workout> &workout_options) {
     std::vector<Workout> workouts(workout_options);
     for (int workout_id : workout_ids) {
-        orderList.push_back(OrderPair(customer_id, workout_options.at(workout_id)));
+        orderList.emplace_back(customer_id, workout_options.at(workout_id));
         salary += workout_options.at(workout_id).getPrice();
     }
 }
@@ -39,8 +122,7 @@ Customer *Trainer::getCustomer(int id) {
 
 void Trainer::removeCustomer(int id) {
     // Remove the customer's orders
-    std::vector<OrderPair> new_orderList;
-    for(OrderPair &cur:orderList){
+    for (OrderPair &cur:orderList) {
         if (cur.first == id) {
             cur.first = -1;
             salary -= cur.second.getPrice();
@@ -117,25 +199,3 @@ Trainer::~Trainer() {
     freeCustomers();
 }
 
-Trainer::Trainer(const Trainer &other) :
-    capacity(other.getCapacity()),
-    open(other.open),
-    customersList(),
-    orderList(other.orderList),
-    salary(other.salary)
-{
-    for (Customer *customer:other.customersList) {
-        if (typeid(*customer) == typeid(SweatyCustomer)) {
-            customersList.push_back(new SweatyCustomer(*dynamic_cast<SweatyCustomer *>(customer)));
-        }
-        else if (typeid(*customer) == typeid(FullBodyCustomer)) {
-            customersList.push_back(new FullBodyCustomer(*dynamic_cast<FullBodyCustomer *>(customer)));
-        }
-        else if (typeid(*customer) == typeid(CheapCustomer)) {
-            customersList.push_back(new CheapCustomer(*dynamic_cast<CheapCustomer *>(customer)));
-        }
-        else {
-            customersList.push_back(new HeavyMuscleCustomer(*dynamic_cast<HeavyMuscleCustomer *>(customer)));
-        }
-    }
-}

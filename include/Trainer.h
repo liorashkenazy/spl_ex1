@@ -11,6 +11,11 @@ class Trainer{
 public:
     Trainer(int t_capacity);
     Trainer(const Trainer& other);
+    Trainer(Trainer&& other);
+    Trainer& operator=(const Trainer& other);
+    Trainer& operator=(Trainer&& other);
+
+
     int getCapacity() const;
     void addCustomer(Customer* customer);
     void removeCustomer(int id);
@@ -23,6 +28,7 @@ public:
     int getSalary();
     bool isOpen();
     std::string toString() const;
+
     virtual ~Trainer();
 private:
     int capacity;
@@ -32,6 +38,7 @@ private:
     int salary;
 
     void freeCustomers();
+    void copyCustomer(const std::vector<Customer*>& customersList);
 };
 
 

@@ -347,5 +347,5 @@ void RestoreStudio::act(Studio &studio) {
 }
 
 std::string RestoreStudio::toString() const {
-    return name + (getStatus() == COMPLETED ? "completed" : "Error: " + getErrorMsg());
+    return name + " " + (getStatus() == COMPLETED ? "completed" : "Error: " + getErrorMsg());
 }
