@@ -89,13 +89,16 @@ void OpenTrainer::act(Studio &studio)
     pTrainer = studio.getTrainer(trainerId);
     for (Customer *pCustomer: customers) {
         if (pTrainer->getCapacity() <= static_cast<int>(pTrainer->getCustomers().size())) {
-            break;
+            // If the trainer is full, delete the extra customers
+            delete pCustomer;
         }
-        // Transfer ownership
-        pTrainer->addCustomer(pCustomer);
+        else {
+            // Transfer ownership
+            pTrainer->addCustomer(pCustomer);
 
-        if (pCustomer->getId() > last_customer_id) {
-            last_customer_id = pCustomer->getId();
+            if (pCustomer->getId() > last_customer_id) {
+                last_customer_id = pCustomer->getId();
+            }
         }
     }
     // Clear the list of customers to indicate they are no longer owned by us
