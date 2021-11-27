@@ -19,7 +19,7 @@ public:
     ActionStatus getStatus() const;
     virtual void act(Studio& studio)=0;
     virtual std::string toString() const=0;
-    virtual ~BaseAction() = default;
+    virtual ~BaseAction();
 protected:
     void complete();
     void error(std::string errorMsg);
@@ -53,6 +53,8 @@ private:
 	std::vector<Customer *> customers;
     // String representation of the successfully added customers, to display in the logs
     std::string added_customers;
+
+    void freeCustomers();
 };
 
 

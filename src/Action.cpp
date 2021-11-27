@@ -29,6 +29,8 @@ std::string BaseAction::getErrorMsg() const {
     return errorMsg;
 }
 
+BaseAction::~BaseAction() {}
+
 
 /************** OpenTrainer ***********/
 const std::string OpenTrainer::name = "open";
@@ -80,6 +82,8 @@ void OpenTrainer::act(Studio &studio)
     int last_customer_id(0);
     Trainer *pTrainer;
     if (studio.getNumOfTrainers() <= trainerId || trainerId < 0 || studio.getTrainer(trainerId)->isOpen()) {
+        // Release the resources in case this action is later shallow-copied, make sure we don't leak or double-free
+        freeCustomers();
         error("Workout session does not exist or is already open.");
         return;
     }
@@ -117,11 +121,17 @@ std::string OpenTrainer::toString() const
            (getStatus() == COMPLETED ? "completed" : "Error: " + getErrorMsg());
 }
 
-OpenTrainer::~OpenTrainer()
+void OpenTrainer::freeCustomers()
 {
     for (Customer *customer:customers) {
         delete customer;
     }
+    customers.clear();
+}
+
+OpenTrainer::~OpenTrainer()
+{
+    freeCustomers();
 }
 
 
@@ -354,6 +364,7 @@ void RestoreStudio::act(Studio &studio) {
         error("No backup available");
         return;
     }
+
     studio = *backup;
     complete();
 }
