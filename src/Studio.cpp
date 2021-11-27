@@ -53,11 +53,11 @@ Studio::Studio(const std::string &configFilePath):
 
 // Copy constructor
 Studio::Studio(const Studio &other) :
-        open(other.open),
-        trainers(),
-        workout_options(other.workout_options),
-        actionsLog(),
-        next_customer_id(other.getCurrentCustomerId())
+    open(other.open),
+    trainers(),
+    workout_options(other.workout_options),
+    actionsLog(),
+    next_customer_id(other.getCurrentCustomerId())
 {
     for (Trainer *trainer:other.trainers) {
         trainers.push_back(new Trainer(*trainer));
@@ -77,6 +77,7 @@ Studio::Studio(Studio &&other) :
         trainers.push_back(trainer);
     }
     other.trainers.clear();
+
     for (BaseAction *action : other.actionsLog) {
         actionsLog.push_back(action);
     }
@@ -88,10 +89,12 @@ Studio &Studio::operator=(const Studio& other) {
     if (this != &other) {
         clear();
         open = other.open;
+
         workout_options.clear();
         for (const Workout &workout:other.workout_options) {
             workout_options.push_back(workout);
         }
+
         next_customer_id = other.next_customer_id;
         for (Trainer *trainer:other.trainers) {
             trainers.push_back(new Trainer(*trainer));
@@ -109,15 +112,18 @@ Studio &Studio::operator=(Studio &&other) {
     for (const Workout &workout:other.workout_options) {
         workout_options.push_back(workout);
     }
+
     next_customer_id = other.next_customer_id;
     for (Trainer *trainer:other.trainers) {
         trainers.push_back(trainer);
     }
     other.trainers.clear();
+
     for (BaseAction *action : other.actionsLog) {
         actionsLog.push_back(action);
     }
     other.actionsLog.clear();
+
     return *this;
 }
 
@@ -139,10 +145,10 @@ void Studio::addWorkoutFromConfig(const std::string &workout_info, int workout_i
         w_type = CARDIO;
     }
 
-    workout_options.emplace_back(Workout(workout_id,
-                                         workout_name,
-                                         std::stoi(workout_info.substr(second_delim_pos + 2)),
-                                         w_type));
+    workout_options.emplace_back(workout_id,
+                                 workout_name,
+                                 std::stoi(workout_info.substr(second_delim_pos + 2)),
+                                 w_type);
 }
 
 int Studio::getCurrentCustomerId() const {

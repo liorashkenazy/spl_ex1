@@ -38,7 +38,7 @@ private:
     int salary;
 
     void freeCustomers();
-    void copyCustomer(std::vector<Customer*> customersList);
+    void copyCustomer(const std::vector<Customer*>& customersList);
 };
 
 
