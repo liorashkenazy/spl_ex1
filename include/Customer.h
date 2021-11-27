@@ -6,6 +6,7 @@
 #include <typeinfo>
 #include "Workout.h"
 
+// String representation of the customer types
 #define CUSTOMER_TYPE_CHEAP_STR "chp"
 #define CUSTOMER_TYPE_SWEATY_STR "swt"
 #define CUSTOMER_TYPE_HEAVY_MUSCLE_STR "mcl"

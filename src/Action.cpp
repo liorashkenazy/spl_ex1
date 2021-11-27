@@ -42,8 +42,10 @@ OpenTrainer *OpenTrainer::createOpenTrainerAction(const std::string &data, int n
     std::vector<Customer *> customers;
     int trainer_id = std::stoi(data);
     int current_id = next_customer_id;
+    // Holds the index of the next space inside the string
     size_t current_customer_index = data.find(' ');
 
+    // Iterate over each customer_name,customer_type pair
     while (current_customer_index != std::string::npos && current_customer_index < data.size() - 1) {
         // Skip the space
         current_customer_index++;
@@ -77,7 +79,7 @@ OpenTrainer *OpenTrainer::createOpenTrainerAction(const std::string &data, int n
 
 void OpenTrainer::act(Studio &studio)
 {
-    int increment_by(0);
+    int last_customer_id(0);
     Trainer *pTrainer;
     if (studio.getNumOfTrainers() <= trainerId || trainerId < 0 || studio.getTrainer(trainerId)->isOpen()) {
         error("Workout session does not exist or is already open.");
@@ -91,12 +93,16 @@ void OpenTrainer::act(Studio &studio)
         }
         // Transfer ownership
         pTrainer->addCustomer(pCustomer);
-        increment_by++;
+
+        if (pCustomer->getId() > last_customer_id) {
+            last_customer_id = pCustomer->getId();
+        }
     }
+    // Clear the list of customers to indicate they are no longer owned by us
     customers.clear();
 
     pTrainer->openTrainer();
-    studio.SetCurrentCustomerId(increment_by);
+    studio.SetNextCustomerId(last_customer_id + 1);
     complete();
 }
 

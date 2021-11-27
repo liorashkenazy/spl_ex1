@@ -5,6 +5,8 @@
 #include <utility>
 #include "Workout.h"
 
+// An array of strings that has to keep the same order as the WorkoutType enums, is used to convert the enum to an
+// appropriate string.
 const std::string Workout::typeToTypeStr[] = {"Anaerobic", "Mixed", "Cardio"};
 
 Workout::Workout(int w_id, std::string w_name, int w_price, WorkoutType w_type):

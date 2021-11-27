@@ -25,6 +25,7 @@ public:
     void order(const int customer_id, const std::vector<int> workout_ids, const std::vector<Workout>& workout_options);
     void openTrainer();
     void closeTrainer();
+    // Return the current salary
     int getSalary();
     bool isOpen();
     std::string toString() const;
@@ -37,8 +38,10 @@ private:
     std::vector<OrderPair> orderList; //A list of pairs for each order for the trainer - (customer_id, Workout)
     int salary;
 
+    // Deletes every instance inside the Customer's vector
     void freeCustomers();
-    void copyCustomer(const std::vector<Customer*>& customersList);
+    // Set the other_customers to be a deep copy of other_customers
+    void copyCustomer(const std::vector<Customer*>& other_customers);
 };
 
 
