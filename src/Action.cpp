@@ -34,16 +34,18 @@ std::string BaseAction::getErrorMsg() const {
 const std::string OpenTrainer::name = "open";
 
 OpenTrainer::OpenTrainer(int id, std::vector<Customer *> &customersList) :
-    trainerId(id),
-    customers(customersList),
-    action_args() {}
+        trainerId(id),
+        customers(customersList),
+        added_customers() {}
 
 OpenTrainer *OpenTrainer::createOpenTrainerAction(const std::string &data, int next_customer_id) {
     std::vector<Customer *> customers;
     int trainer_id = std::stoi(data);
     int current_id = next_customer_id;
+    // Holds the index of the next space inside the string
     size_t current_customer_index = data.find(' ');
 
+    // Iterate over each customer_name,customer_type pair
     while (current_customer_index != std::string::npos && current_customer_index < data.size() - 1) {
         // Skip the space
         current_customer_index++;
@@ -54,30 +56,28 @@ OpenTrainer *OpenTrainer::createOpenTrainerAction(const std::string &data, int n
         current_customer_index = data.find(' ', next_delim_index);
         std::string c_type = data.substr(next_delim_index + 1, current_customer_index - (next_delim_index + 1));
 
-        if (c_type == CUSTOMER_TYPE_CHEAP_STR) {
+        if (c_type == CheapCustomer::type_str) {
             customers.push_back(new CheapCustomer(c_name, current_id));
         }
-        else if (c_type == CUSTOMER_TYPE_FULL_BODY_STR) {
+        else if (c_type == FullBodyCustomer::type_str) {
             customers.push_back(new FullBodyCustomer(c_name, current_id));
         }
-        else if (c_type == CUSTOMER_TYPE_SWEATY_STR) {
+        else if (c_type == SweatyCustomer::type_str) {
             customers.push_back(new SweatyCustomer(c_name, current_id));
         }
-        else if (c_type == CUSTOMER_TYPE_HEAVY_MUSCLE_STR) {
+        else if (c_type == HeavyMuscleCustomer::type_str) {
             customers.push_back(new HeavyMuscleCustomer(c_name, current_id));
         }
 
         current_id++;
     }
 
-    OpenTrainer *new_action = new OpenTrainer(trainer_id, customers);
-    new_action->action_args = data;
-    return new_action;
+    return new OpenTrainer(trainer_id, customers);
 }
 
 void OpenTrainer::act(Studio &studio)
 {
-    int increment_by(0);
+    int last_customer_id(0);
     Trainer *pTrainer;
     if (studio.getNumOfTrainers() <= trainerId || trainerId < 0 || studio.getTrainer(trainerId)->isOpen()) {
         error("Workout session does not exist or is already open.");
@@ -87,22 +87,34 @@ void OpenTrainer::act(Studio &studio)
     pTrainer = studio.getTrainer(trainerId);
     for (Customer *pCustomer: customers) {
         if (pTrainer->getCapacity() <= static_cast<int>(pTrainer->getCustomers().size())) {
-            break;
+            // If the trainer is full, delete the extra customers
+            delete pCustomer;
         }
-        // Transfer ownership
-        pTrainer->addCustomer(pCustomer);
-        increment_by++;
+        else {
+            // Transfer ownership
+            pTrainer->addCustomer(pCustomer);
+
+            if (pCustomer->getId() > last_customer_id) {
+                last_customer_id = pCustomer->getId();
+            }
+            // Save the customers that were actually added to display in the log
+            added_customers += " " + pCustomer->toString();
+        }
     }
+    // Clear the list of customers to indicate they are no longer owned by us
     customers.clear();
 
     pTrainer->openTrainer();
-    studio.SetCurrentCustomerId(increment_by);
+    studio.SetNextCustomerId(last_customer_id + 1);
     complete();
 }
 
 std::string OpenTrainer::toString() const
 {
-    return name + " " + action_args + " " + (getStatus() == COMPLETED ? "completed" : "Error: " + getErrorMsg());
+    return name + " " +
+           std::to_string(trainerId) +
+           added_customers + " " +
+           (getStatus() == COMPLETED ? "completed" : "Error: " + getErrorMsg());
 }
 
 OpenTrainer::~OpenTrainer()

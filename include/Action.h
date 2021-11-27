@@ -6,17 +6,6 @@
 #include <typeinfo>
 #include "Customer.h"
 
-#define ACTION_TYPE_OPEN_TRAINER_STR "open"
-#define ACTION_TYPE_ORDER_STR "order"
-#define ACTION_TYPE_MOVE_CUSTOMER_STR "move"
-#define ACTION_TYPE_CLOSE_STR "close"
-#define ACTION_TYPE_CLOSE_ALL_STR "closeall"
-#define ACTION_TYPE_PRINT_OPTIONS_STR "workout_options"
-#define ACTION_TYPE_PRINT_T_STATUS_STR "status"
-#define ACTION_TYPE_PRINT_LOG_STR "log"
-#define ACTION_TYPE_BACKUP_STR "backup"
-#define ACTION_TYPE_RESTORE_STR "restore"
-
 enum ActionStatus{
     COMPLETED, ERROR
 };
@@ -46,13 +35,24 @@ public:
     OpenTrainer(int id, std::vector<Customer *> &customersList);
     void act(Studio &studio);
     std::string toString() const;
-    static OpenTrainer *createOpenTrainerAction(const std::string &data, int next_customer_id);
-    static const std::string name;
+    // Implemented the destructor as a precautionary action, the destructor should never be called whilst the customers
+    // vector is not empty.
     virtual ~OpenTrainer();
+
+    /* *
+     * @brief Creates a OpenTrainer action based on the user input
+     * @param[in]  data     The user input, expected input is: "trainer_id customer_1_name,customer_1_type
+     *                      customer_2_name,customer_2_type ... customer_n_name,customer_n_type"
+     * @return The created OpenTrainer action.
+     * */
+    static OpenTrainer *createOpenTrainerAction(const std::string &data, int next_customer_id);
+    // String representation of this action's user input command
+    static const std::string name;
 private:
 	const int trainerId;
 	std::vector<Customer *> customers;
-    std::string action_args;
+    // String representation of the successfully added customers, to display in the logs
+    std::string added_customers;
 };
 
 
@@ -61,7 +61,14 @@ public:
     Order(int id);
     void act(Studio &studio);
     std::string toString() const;
+
+    /* *
+     * @brief Creates an Order action based on the user input
+     * @param[in]  data     The user input, expected input is: "trainer_id"
+     * @return The created Order action.
+     * */
     static Order *createOrder(const std::string& data);
+    // String representation of this action's user input command
     static const std::string name;
 private:
     const int trainerId;
@@ -73,7 +80,14 @@ public:
     MoveCustomer(int src, int dst, int customerId);
     void act(Studio &studio);
     std::string toString() const;
+
+    /* *
+     * @brief Creates a CreateMoveCustomer action based on the user input
+     * @param[in]  data     The user input, expected input is: "source_trainer_id dest_trainer_id customer_id"
+     * @return The created MoveCustomer action.
+     * */
     static MoveCustomer *createMoveCustomer(const std::string &data);
+    // String representation of this action's user input command
     static const std::string name;
 private:
     const int srcTrainer;
@@ -87,7 +101,14 @@ public:
     Close(int id);
     void act(Studio &studio);
     std::string toString() const;
+
+    /* *
+     * @brief Creates a Close action based on the user input
+     * @param[in]  data     The user input, expected input is: "trainer_id"
+     * @return The created Close action.
+     * */
     static Close *createClose(const std::string& data);
+    // String representation of this action's user input command
     static const std::string name;
 private:
     const int trainerId;
@@ -99,6 +120,8 @@ public:
     CloseAll();
     void act(Studio &studio);
     std::string toString() const;
+
+    // String representation of this action's user input command
     static const std::string name;
 private:
 };
@@ -109,6 +132,8 @@ public:
     PrintWorkoutOptions();
     void act(Studio &studio);
     std::string toString() const;
+
+    // String representation of this action's user input command
     static const std::string name;
 private:
 };
@@ -119,7 +144,14 @@ public:
     PrintTrainerStatus(int id);
     void act(Studio &studio);
     std::string toString() const;
+
+    /* *
+     * @brief Creates a Close action based on the user input
+     * @param[in]  data     The user input, expected input is: "trainer_id"
+     * @return The created Close action.
+     * */
     static PrintTrainerStatus *createPrintTrainerStatus(const std::string& data);
+    // String representation of this action's user input command
     static const std::string name;
 private:
     const int trainerId;
@@ -131,6 +163,8 @@ public:
     PrintActionsLog();
     void act(Studio &studio);
     std::string toString() const;
+
+    // String representation of this action's user input command
     static const std::string name;
 private:
 };
@@ -141,6 +175,8 @@ public:
     BackupStudio();
     void act(Studio &studio);
     std::string toString() const;
+
+    // String representation of this action's user input command
     static const std::string name;
 private:
 };

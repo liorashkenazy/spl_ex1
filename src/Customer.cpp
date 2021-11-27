@@ -21,6 +21,8 @@ int Customer::getId() const {
 Customer::~Customer() {}
 
 /************** SweatyCustomer ***********/
+const std::string SweatyCustomer::type_str = "swt";
+
 SweatyCustomer::SweatyCustomer(std::string name, int id) : Customer(name, id) {}
 
 std::vector<int> SweatyCustomer::order(const std::vector<Workout> &workout_options) {
@@ -35,15 +37,19 @@ std::vector<int> SweatyCustomer::order(const std::vector<Workout> &workout_optio
 }
 
 std::string SweatyCustomer::toString() const {
-    return std::to_string(getId()) + " " + getName();
+    return getName() + "," + type_str;
 }
 
 
 /************** CheapCustomer ***********/
+const std::string CheapCustomer::type_str = "chp";
+
 CheapCustomer::CheapCustomer(std::string name, int id) : Customer(name, id) {}
 
+// A comparator that returns the cheapest workout
 bool compareCheapPrice(const Workout &a, const Workout &b)
 {
+    // Explicitly choose the workout with the lower id before ones with higher ids if they are the same price.
     if (a.getPrice() == b.getPrice()) {
         return a.getId() < b.getId();
     }
@@ -58,15 +64,19 @@ std::vector<int> CheapCustomer::order(const std::vector<Workout> &workout_option
 }
 
 std::string CheapCustomer::toString() const {
-    return std::to_string(getId()) + " " + getName();
+    return getName() + "," + type_str;
 }
 
 
 /************** HeavyMuscleCustomer ***********/
+const std::string HeavyMuscleCustomer::type_str = "mcl";
+
 HeavyMuscleCustomer::HeavyMuscleCustomer(std::string name, int id) : Customer(name, id) {}
 
+// A comparator that returns the most expensive option
 bool compareMostExpensiveOption(std::pair<int, int> a, std::pair<int, int> b)
 {
+    // Explicitly choose workout options with lower ids first, in case the price is the same
     if (a.second == b.second) {
         return a.first < b.first;
     }
@@ -78,7 +88,7 @@ std::vector<int> HeavyMuscleCustomer::order(const std::vector<Workout> &workout_
     std::vector<std::pair<int, int>> anaerobic_options;
     for (const Workout &workout : workout_options) {
         if (workout.getType() == ANAEROBIC) {
-            anaerobic_options.push_back(std::pair<int,int>(workout.getId(), workout.getPrice()));
+            anaerobic_options.emplace_back(workout.getId(), workout.getPrice());
         }
     }
 
@@ -91,20 +101,14 @@ std::vector<int> HeavyMuscleCustomer::order(const std::vector<Workout> &workout_
 }
 
 std::string HeavyMuscleCustomer::toString() const {
-    return std::to_string(getId()) + " " + getName();
+    return getName() + "," + type_str;
 }
 
 
 /************** FullBodyCustomer ***********/
-FullBodyCustomer::FullBodyCustomer(std::string name, int id) : Customer(name, id) {}
+const std::string FullBodyCustomer::type_str = "fbd";
 
-bool compareCheapestOption(std::pair<int, int> a, std::pair<int, int> b)
-{
-    if (a.second == b.second) {
-        return a.first < b.first;
-    }
-    return a.second < b.second;
-}
+FullBodyCustomer::FullBodyCustomer(std::string name, int id) : Customer(name, id) {}
 
 std::vector<int> FullBodyCustomer::order(const std::vector<Workout> &workout_options) {
     std::vector<int> orders;
@@ -133,6 +137,7 @@ std::vector<int> FullBodyCustomer::order(const std::vector<Workout> &workout_opt
         }
     }
 
+    // Insert the appropriate option to the orders vector, if such option exist
     if (cheapest_cardio.first != -1) {
         orders.push_back(cheapest_cardio.first);
     }
@@ -147,5 +152,5 @@ std::vector<int> FullBodyCustomer::order(const std::vector<Workout> &workout_opt
 }
 
 std::string FullBodyCustomer::toString() const {
-    return std::to_string(getId()) + " " + getName();
+    return getName() + "," + type_str;
 }

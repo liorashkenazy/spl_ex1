@@ -15,6 +15,8 @@ public:
     int getPrice() const;
     WorkoutType getType() const;
     std::string toString() const;
+
+    // An array that maps between WorkoutType enum to a string representation of the workout type
     static const std::string typeToTypeStr[];
 private:
 	const int id;

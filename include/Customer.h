@@ -6,6 +6,7 @@
 #include <typeinfo>
 #include "Workout.h"
 
+// String representation of the customer types
 #define CUSTOMER_TYPE_CHEAP_STR "chp"
 #define CUSTOMER_TYPE_SWEATY_STR "swt"
 #define CUSTOMER_TYPE_HEAVY_MUSCLE_STR "mcl"
@@ -30,6 +31,8 @@ public:
 	SweatyCustomer(std::string name, int id);
     std::vector<int> order(const std::vector<Workout> &workout_options);
     std::string toString() const;
+
+    static const std::string type_str;
 private:
 };
 
@@ -39,6 +42,8 @@ public:
 	CheapCustomer(std::string name, int id);
     std::vector<int> order(const std::vector<Workout> &workout_options);
     std::string toString() const;
+
+    static const std::string type_str;
 private:
 };
 
@@ -48,6 +53,8 @@ public:
 	HeavyMuscleCustomer(std::string name, int id);
     std::vector<int> order(const std::vector<Workout> &workout_options);
     std::string toString() const;
+
+    static const std::string type_str;
 private:
 };
 
@@ -57,6 +64,8 @@ public:
 	FullBodyCustomer(std::string name, int id);
     std::vector<int> order(const std::vector<Workout> &workout_options);
     std::string toString() const;
+
+    static const std::string type_str;
 private:
 };
 

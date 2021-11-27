@@ -48,8 +48,8 @@ Trainer& Trainer::operator=(const Trainer& other) {
         copyCustomer(other.customersList);
 
         orderList.clear();
-        for(OrderPair order:other.orderList){
-            orderList.push_back(OrderPair(order.first, order.second));
+        for (const OrderPair& order:other.orderList) {
+            orderList.emplace_back(order.first, order.second);
         }
 
         salary = other.salary;
@@ -70,7 +70,7 @@ Trainer& Trainer::operator=(Trainer&& other) {
     other.customersList.clear();
 
     orderList.clear();
-    for (OrderPair order:other.orderList) {
+    for (const OrderPair& order:other.orderList) {
         orderList.emplace_back(order.first, order.second);
     }
 
@@ -78,8 +78,8 @@ Trainer& Trainer::operator=(Trainer&& other) {
     return *this;
 }
 
-void Trainer::copyCustomer(const std::vector<Customer*>& otherCustomersList) {
-    for (Customer *customer:otherCustomersList) {
+void Trainer::copyCustomer(const std::vector<Customer*>& other_customers) {
+    for (Customer *customer:other_customers) {
         if (typeid(*customer) == typeid(SweatyCustomer)) {
             customersList.push_back(new SweatyCustomer(*dynamic_cast<SweatyCustomer *>(customer)));
         }
@@ -103,6 +103,7 @@ void Trainer::order(const int customer_id, const std::vector<int> workout_ids, c
     std::vector<Workout> workouts(workout_options);
     for (int workout_id : workout_ids) {
         orderList.emplace_back(customer_id, workout_options.at(workout_id));
+        // Accumulate the salary during the order process
         salary += workout_options.at(workout_id).getPrice();
     }
 }
@@ -125,6 +126,7 @@ void Trainer::removeCustomer(int id) {
     for (OrderPair &cur:orderList) {
         if (cur.first == id) {
             cur.first = -1;
+            // Redact the order from the salary
             salary -= cur.second.getPrice();
         }
     }
@@ -167,8 +169,7 @@ std::string Trainer::toString() const {
         ret += "\nCustomers:";
 
         for (const Customer* customer: customersList) {
-            ret += "\n";
-            ret += customer->toString();
+            ret += "\n" + std::to_string(customer->getId()) + " " + customer->getName();
         }
 
         ret += "\nOrders:";

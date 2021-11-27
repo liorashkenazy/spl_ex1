@@ -25,14 +25,18 @@ Studio::Studio(const std::string &configFilePath):
     int workout_id(0);
     config_file.open(configFilePath);
 
+    // Iterate over each line
     while (std::getline(config_file, cur_line)) {
+        // Skip empty or comment lines
         if (cur_line.length() == 0 || cur_line.at(0) == '#') {
             continue;
         }
+        // First, extract the total number of trainers
         if (!num_trainers_read) {
             num_trainers = std::stoi(cur_line);
             num_trainers_read = true;
         }
+        // Second, read the capacities of the trainers
         else if (!capacities_read) {
             size_t next_pos(0);
             size_t current_pos(0);
@@ -44,6 +48,7 @@ Studio::Studio(const std::string &configFilePath):
             }
             capacities_read = true;
         }
+        // Lastly, parse the workout options
         else {
             addWorkoutFromConfig(cur_line, workout_id);
             workout_id++;
@@ -57,7 +62,7 @@ Studio::Studio(const Studio &other) :
     trainers(),
     workout_options(other.workout_options),
     actionsLog(),
-    next_customer_id(other.getCurrentCustomerId())
+    next_customer_id(other.getNextCustomerId())
 {
     for (Trainer *trainer:other.trainers) {
         trainers.push_back(new Trainer(*trainer));
@@ -71,7 +76,7 @@ Studio::Studio(Studio &&other) :
         trainers(),
         workout_options(other.workout_options),
         actionsLog(),
-        next_customer_id(other.getCurrentCustomerId())
+        next_customer_id(other.getNextCustomerId())
 {
     for (Trainer *trainer:other.trainers) {
         trainers.push_back(trainer);
@@ -137,6 +142,7 @@ void Studio::addWorkoutFromConfig(const std::string &workout_info, int workout_i
     std::string workout_type(workout_info.substr(first_delim_pos + 2, second_delim_pos - (first_delim_pos + 2)));
     WorkoutType w_type;
 
+    // Select the workout type based of the string representation of the type
     if (workout_type == Workout::typeToTypeStr[ANAEROBIC - ANAEROBIC]) {
         w_type = ANAEROBIC;
     } else if (workout_type == Workout::typeToTypeStr[MIXED - ANAEROBIC]) {
@@ -151,11 +157,11 @@ void Studio::addWorkoutFromConfig(const std::string &workout_info, int workout_i
                                  w_type);
 }
 
-int Studio::getCurrentCustomerId() const {
+int Studio::getNextCustomerId() const {
     return next_customer_id;
 }
-void Studio::SetCurrentCustomerId(int increment_by) {
-    next_customer_id += increment_by;
+void Studio::SetNextCustomerId(int next_id) {
+    next_customer_id = next_id;
 }
 
 int Studio::getNumOfTrainers() const {
@@ -170,17 +176,13 @@ const std::vector<BaseAction *> &Studio::getActionsLog() const {
     return actionsLog;
 }
 
-void Studio::addActionToLog(BaseAction *action) {
-    actionsLog.push_back(action);
-}
-
 BaseAction * Studio::parseAction(const std::string &action_str)
 {
     std::string action_type = action_str.substr(0, action_str.find(' '));
 
     std::string data = action_str.find(' ') == string::npos ? "": action_str.substr(action_str.find(' ') + 1);
     if (action_type == OpenTrainer::name) {
-        return OpenTrainer::createOpenTrainerAction(data, getCurrentCustomerId());
+        return OpenTrainer::createOpenTrainerAction(data, getNextCustomerId());
     }
     else if (action_type == Order::name) {
         return Order::createOrder(data);
@@ -223,7 +225,7 @@ void Studio::start()
         getline(cin, current_input);
         BaseAction *next_action = parseAction(current_input);
         next_action->act(*this);
-        addActionToLog(next_action);
+        actionsLog.push_back(next_action);
     }
 }
 
